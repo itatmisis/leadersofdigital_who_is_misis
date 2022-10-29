@@ -2,3 +2,4 @@ python-dotenv
 Flask
 Flask-SQLAlchemy
 pyshp
+GeoAlchemy2
