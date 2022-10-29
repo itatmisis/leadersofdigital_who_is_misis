@@ -15,4 +15,6 @@ class SanitaryProtectionZone(db.Model):
     points = Column(ARRAY(DECIMAL()))
     bbox = Column(ARRAY(DECIMAL()))
 
-    vid_zouit = Column(String())
+    name = Column(String())
+    number = Column(String()) # all entries from dataset were 'None'
+    object_id = Column(String())
