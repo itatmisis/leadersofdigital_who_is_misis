@@ -1,22 +1,29 @@
 import os
 
+import openpyxl
 from shapely import geometry, wkt
 import shapefile
-from backend import app, db
-from backend.data.models import Land
+from backend import db
+from backend.data.models import Land, BadBuilding
 
 DATASET_PATHS = {
     "lands": "ЗУ/Земельные_участки.shp",
     "capital": "ОКС/ОКС.shp",
     "organizations": "Организации СВАО_САО/Организации_СВАО_САО.shp",
     "start_grounds": "Стартовые площадки/Стартовые_площадки_реновации.shp",
-    "cultural_inheritance": "Территории объектов культурного наследия/Территории_объектов_культурного_наследия.shp"
+    "cultural_inheritance": "Территории объектов культурного наследия/Территории_объектов_культурного_наследия.shp",
+    "bad_records": "Аварийные_Самовольные_Несоответствие_ВРИ_СВАО_САО.xlsx",
+    "buildings": "Здания СВАО_САО жилое_нежилое.xlsx"
 }
 TRUNCATE_TABLE = "TRUNCATE TABLE {}"
+YES = "Да"
 
 
 def main(path_to_dataset):
     load_lands(path_to_dataset)
+    load_bad_buildings(path_to_dataset)
+
+    db.session.commit()
 
 
 def load_lands(path_to_dataset):  # ЗУ
@@ -38,7 +45,7 @@ def load_lands(path_to_dataset):  # ЗУ
             shape_area=shaperec.record.SHAPE_AREA
         )
         db.session.add(obj)
-    db.session.commit()
+    reader.close()
 
 
 def load_capital():  # ОКС
@@ -59,3 +66,21 @@ def load_start_grounds():  # Стартовые площадки
 
 def load_cultural_inheritance():  # Территории объектов культурного наследия
     pass
+
+
+def load_bad_buildings(path_to_dataset):
+    db.session.execute(TRUNCATE_TABLE.format(BadBuilding.__tablename__))
+
+    wb = openpyxl.load_workbook(filename=os.path.join(path_to_dataset, DATASET_PATHS["bad_records"]))
+    ws = wb.active
+    for row in ws.iter_rows(values_only=True):
+        district, cadnum, unauthorized, mismatch, hazardous = row
+        bad_building = BadBuilding(
+            cadnum=cadnum,
+            district=district,
+            unauthorized=unauthorized == YES,
+            mismatch=mismatch == YES,
+            hazardous=hazardous == YES,
+        )
+        db.session.merge(bad_building)
+    wb.close()
