@@ -4,7 +4,7 @@ import openpyxl
 from shapely import geometry, wkt
 import shapefile
 from backend import db
-from backend.data.models import Land, BadBuilding
+from backend.data.models import Land, BadBuilding, Building
 
 DATASET_PATHS = {
     "lands": "ЗУ/Земельные_участки.shp",
@@ -17,11 +17,13 @@ DATASET_PATHS = {
 }
 TRUNCATE_TABLE = "TRUNCATE TABLE {}"
 YES = "Да"
+HABITABLE_STR = "жилое"
 
 
 def main(path_to_dataset):
     load_lands(path_to_dataset)
     load_bad_buildings(path_to_dataset)
+    load_buildings(path_to_dataset)
 
     db.session.commit()
 
@@ -73,7 +75,7 @@ def load_bad_buildings(path_to_dataset):
 
     wb = openpyxl.load_workbook(filename=os.path.join(path_to_dataset, DATASET_PATHS["bad_records"]))
     ws = wb.active
-    for row in ws.iter_rows(values_only=True):
+    for row in ws.iter_rows(min_row=2, values_only=True):
         district, cadnum, unauthorized, mismatch, hazardous = row
         bad_building = BadBuilding(
             cadnum=cadnum,
@@ -81,6 +83,30 @@ def load_bad_buildings(path_to_dataset):
             unauthorized=unauthorized == YES,
             mismatch=mismatch == YES,
             hazardous=hazardous == YES,
+        )
+        db.session.merge(bad_building)
+    wb.close()
+
+
+def load_buildings(path_to_dataset):
+    db.session.execute(TRUNCATE_TABLE.format(Building.__tablename__))
+
+    wb = openpyxl.load_workbook(filename=os.path.join(path_to_dataset, DATASET_PATHS["buildings"]))
+    ws = wb.active
+    for row in ws.iter_rows(min_row=2, values_only=True):
+        cadnum, address, area, habitable, year_built, wall_material, hazardous, typical = row
+        if year_built == '' or year_built == 0:
+            year_built = None
+
+        bad_building = Building(
+            cadnum=cadnum,
+            address=address,
+            area=area,
+            habitable=habitable == HABITABLE_STR,
+            year_built=year_built,
+            wall_material=wall_material,
+            hazardous=hazardous == YES,
+            typical=typical == YES
         )
         db.session.merge(bad_building)
     wb.close()
