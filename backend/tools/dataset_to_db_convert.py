@@ -5,7 +5,7 @@ import openpyxl
 from shapely import geometry, wkt
 import shapefile
 from backend import db
-from backend.data.models import Land, BadBuilding, Building, Organization
+from backend.data.models import *
 from backend.data.models.start_ground import StartGround
 
 DATASET_PATHS = {
@@ -62,7 +62,6 @@ def load_lands(path_to_dataset):  # ЗУ
     for shaperec in reader.shapeRecords():
         obj = Land(
             oid=shaperec.shape.oid,
-            shapetype=shaperec.shape.shapeType,
             parts=list(shaperec.shape.parts),
             points=wkt.dumps(geometry.MultiPoint(shaperec.shape.points)),
             bbox=wkt.dumps(geometry.box(*shaperec.shape.bbox)),
@@ -77,23 +76,23 @@ def load_lands(path_to_dataset):  # ЗУ
     reader.close()
 
 
-def load_capital(path):  # ОКС
-    sf = shapefile.Reader(path, encoding='cp1251')
-    for index, elem in enumerate(sf.shapes()):
-        fields = {
-            'oid': elem.oid,
-            'shapetype': elem.shapeType,
-            'parts': elem.parts,
-            'points': elem.points,
-            'bbox': elem.bbox,
+def load_capital(path_to_dataset):  # ОКС
+    db.session.execute(TRUNCATE_TABLE.format(CapitalConstructionWorks.__tablename__))
 
-            'cadnum': sf.records()[index].cadnum,
-            'address': sf.records()[index].address,
-            'area': sf.records()[index].Area,
-        }
-        construction = ConstructionWorks(**fields)
-        db.session.add(construction)
-        db.session.commit()
+    reader = shapefile.Reader(os.path.join(path_to_dataset, DATASET_PATHS["capital"]), encoding="cp1251")
+    for shaperec in reader.shapeRecords():
+        obj = CapitalConstructionWorks(
+            oid=shaperec.shape.oid,
+            parts=list(shaperec.shape.parts),
+            points=wkt.dumps(geometry.MultiPoint(shaperec.shape.points)),
+            bbox=wkt.dumps(geometry.box(*shaperec.shape.bbox)),
+
+            cadnum=shaperec.record.cadnum,
+            address=shaperec.record.address,
+            area=shaperec.record.Area
+        )
+        db.session.add(obj)
+    reader.close()
 
 
 def load_organizations(path_to_dataset):  # Организации СВАО_САО
@@ -113,7 +112,20 @@ def load_organizations(path_to_dataset):  # Организации СВАО_СА
 
 
 def load_protected_zones(path_to_dataset):  # Санитарно-защитные зоны
-    pass
+    db.session.execute(TRUNCATE_TABLE.format(SanitaryProtectedZone.__tablename__))
+
+    reader = shapefile.Reader(os.path.join(path_to_dataset, DATASET_PATHS["protected_zones"]), encoding="cp1251")
+    for shaperec in reader.shapeRecords():
+        obj = SanitaryProtectedZone(
+            oid=shaperec.shape.oid,
+            parts=list(shaperec.shape.parts),
+            points=wkt.dumps(geometry.MultiPoint(shaperec.shape.points)),
+            bbox=wkt.dumps(geometry.box(*shaperec.shape.bbox)),
+
+            zone_type=shaperec.record.VID_ZOUIT
+        )
+        db.session.add(obj)
+    reader.close()
 
 
 def load_start_grounds(path_to_dataset):  # Стартовые площадки
@@ -135,7 +147,23 @@ def load_start_grounds(path_to_dataset):  # Стартовые площадки
 
 
 def load_cultural_inheritance(path_to_dataset):  # Территории объектов культурного наследия
-    pass
+    db.session.execute(TRUNCATE_TABLE.format(CulturalHeritage.__tablename__))
+
+    reader = shapefile.Reader(os.path.join(path_to_dataset, DATASET_PATHS["cultural_inheritance"]), encoding="cp1251")
+    for shaperec in reader.shapeRecords():
+        obj = CulturalHeritage(
+            oid=shaperec.shape.oid,
+            parts=list(shaperec.shape.parts),
+            points=wkt.dumps(geometry.MultiPoint(shaperec.shape.points)),
+            bbox=wkt.dumps(geometry.box(*shaperec.shape.bbox)),
+
+            name=shaperec.record.name,
+            number=shaperec.record.number,
+            object_id=shaperec.record.objectid
+
+        )
+        db.session.add(obj)
+    reader.close()
 
 
 def load_bad_buildings(path_to_dataset):

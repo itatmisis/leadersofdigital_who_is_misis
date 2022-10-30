@@ -10,7 +10,6 @@ class Land(db.Model):
 
     oid = Column(Integer, primary_key=True)
 
-    shapetype = Column(Integer)  # shapefile.SHAPETYPE_LOOKUP
     parts = Column(ARRAY(Integer))
     points = Column(Geometry(geometry_type="MULTIPOINT"))
     bbox = Column(Geometry(geometry_type="POLYGON"))
