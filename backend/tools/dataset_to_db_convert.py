@@ -1,16 +1,18 @@
 import os
+import time
 
 import openpyxl
-import shapely.geometry
 from shapely import geometry, wkt
 import shapefile
 from backend import db
 from backend.data.models import Land, BadBuilding, Building, Organization
+from backend.data.models.start_ground import StartGround
 
 DATASET_PATHS = {
     "lands": "ЗУ/Земельные_участки.shp",
     "capital": "ОКС/ОКС.shp",
     "organizations": "Организации СВАО_САО/Организации_СВАО_САО.shp",
+    "protected_zones": "Санитарно-защитные зоны/СЗЗ.shp",
     "start_grounds": "Стартовые площадки/Стартовые_площадки_реновации.shp",
     "cultural_inheritance": "Территории объектов культурного наследия/Территории_объектов_культурного_наследия.shp",
     "bad_records": "Аварийные_Самовольные_Несоответствие_ВРИ_СВАО_САО.xlsx",
@@ -21,11 +23,34 @@ YES = "Да"
 HABITABLE_STR = "жилое"
 
 
-def main(path_to_dataset):
-    load_lands(path_to_dataset)
-    load_organizations(path_to_dataset)
-    load_bad_buildings(path_to_dataset)
-    load_buildings(path_to_dataset)
+def main(path_to_dataset, progress_output_stream=None):
+    i = 0
+
+    def progress_log_wrapper(f, *args, _ostream=progress_output_stream, _caption, **kwargs):
+        nonlocal i
+        i += 1
+
+        try:
+            start = time.time()
+            f(*args, **kwargs)
+            if _ostream is not None:
+                _ostream.write(f"({i / 8 * 100}%)\t -- \"{_caption}\" loaded in {time.time() - start : .3f}s\n")
+        except Exception as e:
+            if _ostream is not None:
+                _ostream.write(f"\"{_caption}\" cannot be loaded, all changes cancelled\n")
+            raise e
+        return None
+
+    progress_log_wrapper(load_lands, path_to_dataset, _caption="ЗУ")
+    progress_log_wrapper(load_capital, path_to_dataset, _caption="ОКС")
+    progress_log_wrapper(load_organizations, path_to_dataset, _caption="Организации СВАО_САО")
+    progress_log_wrapper(load_protected_zones, path_to_dataset, _caption="Санитарно-защитные зоны")
+    progress_log_wrapper(load_start_grounds, path_to_dataset, _caption="Стартовые площадки")
+    progress_log_wrapper(load_cultural_inheritance, path_to_dataset,
+                         _caption="Территории объектов культурного наследия")
+    progress_log_wrapper(load_bad_buildings, path_to_dataset,
+                         _caption="Аварийные_Самовольные_Несоответствие_ВРИ_СВАО_САО")
+    progress_log_wrapper(load_buildings, path_to_dataset, _caption="Здания СВАО_САО жилое_нежилое")
 
     db.session.commit()
 
@@ -52,35 +77,49 @@ def load_lands(path_to_dataset):  # ЗУ
     reader.close()
 
 
-def load_capital():  # ОКС
+def load_capital(path_to_dataset):  # ОКС
     pass
 
 
 def load_organizations(path_to_dataset):  # Организации СВАО_САО
-    db.session.execute(TRUNCATE_TABLE.format(Land.__tablename__))
+    db.session.execute(TRUNCATE_TABLE.format(Organization.__tablename__))
 
     reader = shapefile.Reader(os.path.join(path_to_dataset, DATASET_PATHS["organizations"]), encoding="cp1251")
     for shaperec in reader.shapeRecords():
-        org = Organization(
+        obj = Organization(
             oid=shaperec.shape.oid,
             point=wkt.dumps(geometry.Point(*shaperec.shape.points[0])),
 
             name=shaperec.record.name,
             kol_mest=shaperec.record.kol_mest
         )
-        db.session.add(org)
+        db.session.add(obj)
     reader.close()
 
 
-def load_protected_zones():  # Санитарно-защитные зоны
+def load_protected_zones(path_to_dataset):  # Санитарно-защитные зоны
     pass
 
 
-def load_start_grounds():  # Стартовые площадки
-    pass
+def load_start_grounds(path_to_dataset):  # Стартовые площадки
+    db.session.execute(TRUNCATE_TABLE.format(StartGround.__tablename__))
+
+    reader = shapefile.Reader(os.path.join(path_to_dataset, DATASET_PATHS["start_grounds"]), encoding="cp1251")
+    for shaperec in reader.shapeRecords():
+        obj = StartGround(
+            oid=shaperec.shape.oid,
+            parts=list(shaperec.shape.parts),
+            points=wkt.dumps(geometry.MultiPoint(shaperec.shape.points)),
+            bbox=wkt.dumps(geometry.box(*shaperec.shape.bbox)),
+
+            address=shaperec.record.address,
+            district=shaperec.record.rayon
+        )
+        db.session.add(obj)
+    reader.close()
 
 
-def load_cultural_inheritance():  # Территории объектов культурного наследия
+def load_cultural_inheritance(path_to_dataset):  # Территории объектов культурного наследия
     pass
 
 
@@ -91,14 +130,14 @@ def load_bad_buildings(path_to_dataset):
     ws = wb.active
     for row in ws.iter_rows(min_row=2, values_only=True):
         district, cadnum, unauthorized, mismatch, hazardous = row
-        bad_building = BadBuilding(
+        obj = BadBuilding(
             cadnum=cadnum,
             district=district,
             unauthorized=unauthorized == YES,
             mismatch=mismatch == YES,
             hazardous=hazardous == YES,
         )
-        db.session.merge(bad_building)
+        db.session.merge(obj)
     wb.close()
 
 
@@ -112,7 +151,7 @@ def load_buildings(path_to_dataset):
         if year_built == '' or year_built == 0:
             year_built = None
 
-        bad_building = Building(
+        obj = Building(
             cadnum=cadnum,
             address=address,
             area=area,
@@ -122,5 +161,5 @@ def load_buildings(path_to_dataset):
             hazardous=hazardous == YES,
             typical=typical == YES
         )
-        db.session.merge(bad_building)
+        db.session.merge(obj)
     wb.close()
