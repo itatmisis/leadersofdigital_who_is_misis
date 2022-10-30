@@ -1,4 +1,3 @@
-import shapefile
 from sqlalchemy import Column, Integer, String, Enum, DECIMAL
 from sqlalchemy.dialects.postgresql import ARRAY
 from geoalchemy2.types import Geometry

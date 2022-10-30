@@ -1,10 +1,11 @@
 import os
 
 import openpyxl
+import shapely.geometry
 from shapely import geometry, wkt
 import shapefile
 from backend import db
-from backend.data.models import Land, BadBuilding, Building
+from backend.data.models import Land, BadBuilding, Building, Organization
 
 DATASET_PATHS = {
     "lands": "ЗУ/Земельные_участки.shp",
@@ -22,6 +23,7 @@ HABITABLE_STR = "жилое"
 
 def main(path_to_dataset):
     load_lands(path_to_dataset)
+    load_organizations(path_to_dataset)
     load_bad_buildings(path_to_dataset)
     load_buildings(path_to_dataset)
 
@@ -54,8 +56,20 @@ def load_capital():  # ОКС
     pass
 
 
-def load_organizations():  # Организации СВАО_САО
-    pass
+def load_organizations(path_to_dataset):  # Организации СВАО_САО
+    db.session.execute(TRUNCATE_TABLE.format(Land.__tablename__))
+
+    reader = shapefile.Reader(os.path.join(path_to_dataset, DATASET_PATHS["organizations"]), encoding="cp1251")
+    for shaperec in reader.shapeRecords():
+        org = Organization(
+            oid=shaperec.shape.oid,
+            point=wkt.dumps(geometry.Point(*shaperec.shape.points[0])),
+
+            name=shaperec.record.name,
+            kol_mest=shaperec.record.kol_mest
+        )
+        db.session.add(org)
+    reader.close()
 
 
 def load_protected_zones():  # Санитарно-защитные зоны
