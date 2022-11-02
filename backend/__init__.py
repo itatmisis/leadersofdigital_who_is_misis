@@ -22,3 +22,5 @@ with app.app_context():
     db.create_all()
 
 from backend import cli_manager
+
+from backend.controllers import *
