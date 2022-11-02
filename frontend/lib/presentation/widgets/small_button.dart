@@ -16,18 +16,22 @@ class SmallButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onPressed,
-      child: Container(
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            color: AppColors.neutralWhite),
-        child: Padding(
-          padding: EdgeInsets.all(12),
-          child: SvgPicture.asset(
-            icon,
-            height: 20,
-            color: color,
+    return Material(
+      elevation: 3,
+      borderRadius: BorderRadius.circular(8),
+      child: GestureDetector(
+        onTap: onPressed,
+        child: Container(
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              color: AppColors.neutralWhite),
+          child: Padding(
+            padding: EdgeInsets.all(12),
+            child: SvgPicture.asset(
+              icon,
+              height: 20,
+              color: color,
+            ),
           ),
         ),
       ),

@@ -10,37 +10,41 @@ class PlusMinusWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          color: AppColors.neutralWhite),
-      child: Column(
-        children: [
-          GestureDetector(
-            onTap: onPlus,
-            behavior: HitTestBehavior.opaque,
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: SvgPicture.asset(
-                "assets/icons/add.svg",
-                height: 20,
-                color: AppColors.neutral800,
+    return Material(
+      elevation: 3,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            color: AppColors.neutralWhite),
+        child: Column(
+          children: [
+            GestureDetector(
+              onTap: onPlus,
+              behavior: HitTestBehavior.opaque,
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: SvgPicture.asset(
+                  "assets/icons/add.svg",
+                  height: 20,
+                  color: AppColors.neutral800,
+                ),
               ),
             ),
-          ),
-          GestureDetector(
-            onTap: onMinus,
-            behavior: HitTestBehavior.opaque,
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: SvgPicture.asset(
-                "assets/icons/remove.svg",
-                height: 20,
-                color: AppColors.neutral800,
+            GestureDetector(
+              onTap: onMinus,
+              behavior: HitTestBehavior.opaque,
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: SvgPicture.asset(
+                  "assets/icons/remove.svg",
+                  height: 20,
+                  color: AppColors.neutral800,
+                ),
               ),
-            ),
-          )
-        ],
+            )
+          ],
+        ),
       ),
     );
   }
