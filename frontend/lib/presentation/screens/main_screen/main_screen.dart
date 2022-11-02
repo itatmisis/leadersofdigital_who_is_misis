@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/presentation/screens/main_screen/widgets/plus_minus.dart';
 import 'package:frontend/presentation/theme/app_colors.dart';
-import 'package:frontend/presentation/widgets/lct_button/lct_button.dart';
+import 'package:frontend/presentation/widgets/search.dart';
 import 'package:frontend/presentation/widgets/small_button.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:pointer_interceptor/pointer_interceptor.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -17,6 +17,16 @@ class _MainScreenState extends State<MainScreen> {
   late MapboxMapController controller;
   bool onDrawed = false;
 
+  void onCameraZoomPlus() {
+    controller.animateCamera(
+        CameraUpdate.zoomTo(controller.cameraPosition!.zoom + 1));
+  }
+
+  void onCameraZoomMinus() {
+    controller.animateCamera(
+        CameraUpdate.zoomTo(controller.cameraPosition!.zoom - 1));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,6 +34,7 @@ class _MainScreenState extends State<MainScreen> {
         child: Stack(
           children: [
             MapboxMap(
+              compassEnabled: false,
               accessToken:
                   'pk.eyJ1IjoicGl0dXNhbm9uaW1vdXMiLCJhIjoiY2twcHk5M2VtMDZvZjJ2bzEzMHNhNDM1diJ9.8BLcJknh8FvUVLJRZbHJDQ',
               styleString:
@@ -62,44 +73,46 @@ class _MainScreenState extends State<MainScreen> {
                 );
               },
             ),
-            Positioned(
-              top: 40,
-              right: 40,
-              bottom: 40,
-              child: Container(
-                height: MediaQuery.of(context).size.height,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    SmallButton(
-                        icon: "assets/icons/layers.svg",
-                        color: AppColors.neutral800,
-                        onPressed: () {}),
-                    Column(
-                      children: [
-                        const PlusMinusWidget(),
-                        const SizedBox(
-                          height: 24,
-                        ),
-                        SmallButton(
-                            icon: "assets/icons/layers.svg",
-                            color: AppColors.neutral800,
-                            onPressed: () {}),
-                        const SizedBox(
-                          height: 24,
-                        ),
-                        SmallButton(
-                            icon: "assets/icons/settings.svg",
-                            color: AppColors.neutral800,
-                            onPressed: () {}),
-                      ],
-                    ),
-                    LCTButton(text: "Coхранить", onPressed: (){}, color: AppColors.eggshellBlue800),
-                  ],
+            Align(
+                alignment: Alignment.centerRight,
+                child: Padding(
+                  padding: EdgeInsets.only(right: 10),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      PointerInterceptor(
+                        child: PlusMinusWidget(
+                            onPlus: onCameraZoomPlus,
+                            onMinus: onCameraZoomMinus),
+                      ),
+                      const SizedBox(
+                        height: 24,
+                      ),
+                      PointerInterceptor(
+                          child: SmallButton(
+                              icon: "assets/icons/layers.svg",
+                              color: AppColors.neutral800,
+                              onPressed: () {})),
+                      const SizedBox(
+                        height: 24,
+                      ),
+                      PointerInterceptor(
+                          child: SmallButton(
+                              icon: "assets/icons/settings.svg",
+                              color: AppColors.neutral800,
+                              onPressed: () {})),
+                    ],
+                  ),
+                )),
+            Align(
+              alignment: Alignment.topLeft,
+              child: Padding(
+                padding: EdgeInsets.only(left: 10, top: 10),
+                child: PointerInterceptor(
+                  child: Search.v1(),
                 ),
               ),
-            ),
+            )
           ],
         ),
       ),
