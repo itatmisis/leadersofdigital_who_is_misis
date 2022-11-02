@@ -1,10 +1,9 @@
-from shapely import geometry, wkt
-
+import geoalchemy2
 from flask import jsonify
 
 from backend import app, db
 from backend.data.models import Land
-import geoalchemy2
+from backend.tools import coord_convert
 
 
 @app.route("/api/<string:entity>/get_polygons")
@@ -17,12 +16,13 @@ def get_polygons_controller(entity: str):  # TODO: Заглушка
     :return:
     """
     if entity == "lands":
+        converter = coord_convert.CoordConverter()
         return jsonify({
             "lands": [
                 {
                     "oid": obj.oid,
                     "polygons": [
-                        list(map(lambda p: (p.x, p.y),  # TODO: перевод в нормальную СК
+                        list(map(lambda p: converter._from_msk_to_wgs84(p.x, p.y),
                                  geoalchemy2.shape.to_shape(obj.points)))
                     ]
                 } for obj in db.session.query(Land).filter(Land.parts == [0]).limit(10)
