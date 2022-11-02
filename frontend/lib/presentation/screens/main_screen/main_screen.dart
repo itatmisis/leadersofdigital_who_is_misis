@@ -65,8 +65,9 @@ class _MainScreenState extends State<MainScreen> {
             Positioned(
               top: 40,
               right: 40,
+              bottom: 40,
               child: Container(
-                height: MediaQuery.of(context).size.height* MediaQuery.of(context).devicePixelRatio,
+                height: MediaQuery.of(context).size.height,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.end,
