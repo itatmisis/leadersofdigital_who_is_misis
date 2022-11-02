@@ -1,10 +1,7 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/presentation/screens/main_screen/widgets/plus_minus.dart';
 import 'package:frontend/presentation/theme/app_colors.dart';
-import 'package:frontend/presentation/widgets/lct_button/lct_button.dart';
+import 'package:frontend/presentation/widgets/search.dart';
 import 'package:frontend/presentation/widgets/small_button.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
@@ -21,11 +18,13 @@ class _MainScreenState extends State<MainScreen> {
   bool onDrawed = false;
 
   void onCameraZoomPlus() {
-    controller.animateCamera(CameraUpdate.zoomTo(controller.cameraPosition!.zoom+1));
+    controller.animateCamera(
+        CameraUpdate.zoomTo(controller.cameraPosition!.zoom + 1));
   }
 
   void onCameraZoomMinus() {
-    controller.animateCamera(CameraUpdate.zoomTo(controller.cameraPosition!.zoom-1));
+    controller.animateCamera(
+        CameraUpdate.zoomTo(controller.cameraPosition!.zoom - 1));
   }
 
   @override
@@ -75,30 +74,44 @@ class _MainScreenState extends State<MainScreen> {
               },
             ),
             Align(
-              alignment: Alignment.centerRight,
+                alignment: Alignment.centerRight,
+                child: Padding(
+                  padding: EdgeInsets.only(right: 10),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      PointerInterceptor(
+                        child: PlusMinusWidget(
+                            onPlus: onCameraZoomPlus,
+                            onMinus: onCameraZoomMinus),
+                      ),
+                      const SizedBox(
+                        height: 24,
+                      ),
+                      PointerInterceptor(
+                          child: SmallButton(
+                              icon: "assets/icons/layers.svg",
+                              color: AppColors.neutral800,
+                              onPressed: () {})),
+                      const SizedBox(
+                        height: 24,
+                      ),
+                      PointerInterceptor(
+                          child: SmallButton(
+                              icon: "assets/icons/settings.svg",
+                              color: AppColors.neutral800,
+                              onPressed: () {})),
+                    ],
+                  ),
+                )),
+            Align(
+              alignment: Alignment.topLeft,
               child: Padding(
-                padding: EdgeInsets.only(right: 10),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    PointerInterceptor(child: PlusMinusWidget(onPlus: onCameraZoomPlus, onMinus: onCameraZoomMinus),),
-                    const SizedBox(
-                      height: 24,
-                    ),
-                    PointerInterceptor(child: SmallButton(
-                        icon: "assets/icons/layers.svg",
-                        color: AppColors.neutral800,
-                        onPressed: () {})),
-                    const SizedBox(
-                      height: 24,
-                    ),
-                    PointerInterceptor(child: SmallButton(
-                        icon: "assets/icons/settings.svg",
-                        color: AppColors.neutral800,
-                        onPressed: () {})),
-                  ],
+                padding: EdgeInsets.only(left: 10, top: 10),
+                child: PointerInterceptor(
+                  child: Search.v1(),
                 ),
-              )
+              ),
             )
           ],
         ),
