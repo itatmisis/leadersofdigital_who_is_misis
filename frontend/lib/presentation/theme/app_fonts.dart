@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 extension LogicSize on num {
-  static const double _scaleFactor = 1;
+  static const double _scaleFactor = 0.8;
 
   double get sc => this * _scaleFactor;
 }
