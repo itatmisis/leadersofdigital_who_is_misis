@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:frontend/presentation/screens/main_screen/widgets/plus_minus.dart';
 import 'package:frontend/presentation/theme/app_colors.dart';
 import 'package:frontend/presentation/widgets/lct_button/lct_button.dart';
 import 'package:frontend/presentation/widgets/small_button.dart';
@@ -61,33 +62,42 @@ class _MainScreenState extends State<MainScreen> {
                 );
               },
             ),
-            TextButton(
-              onPressed: () {},
-              child: const Text("Base"),
-            ),
             Positioned(
-              top: 80,
+              top: 40,
               right: 40,
-              child: SmallButton(
-                  icon: "assets/icons/layers.svg",
-                  color: AppColors.neutral800,
-                  onPressed: () {}),
-            ),
-            Positioned(
-              top: 120,
-              right: 40,
-              child: SmallButton(
-                  icon: "assets/icons/add.svg",
-                  color: AppColors.neutral800,
-                  onPressed: () {}),
-            ),
-            Positioned(
-              top: 160,
-              right: 40,
-              child: SmallButton(
-                  icon: "assets/icons/remove.svg",
-                  color: AppColors.neutral800,
-                  onPressed: () {}),
+              child: Container(
+                height: MediaQuery.of(context).size.height* MediaQuery.of(context).devicePixelRatio,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    SmallButton(
+                        icon: "assets/icons/layers.svg",
+                        color: AppColors.neutral800,
+                        onPressed: () {}),
+                    Column(
+                      children: [
+                        const PlusMinusWidget(),
+                        const SizedBox(
+                          height: 24,
+                        ),
+                        SmallButton(
+                            icon: "assets/icons/layers.svg",
+                            color: AppColors.neutral800,
+                            onPressed: () {}),
+                        const SizedBox(
+                          height: 24,
+                        ),
+                        SmallButton(
+                            icon: "assets/icons/settings.svg",
+                            color: AppColors.neutral800,
+                            onPressed: () {}),
+                      ],
+                    ),
+                    LCTButton(text: "Coхранить", onPressed: (){}, color: AppColors.eggshellBlue800),
+                  ],
+                ),
+              ),
             ),
           ],
         ),

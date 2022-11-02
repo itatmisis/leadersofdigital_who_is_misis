@@ -35,7 +35,7 @@ class LCTButton extends StatelessWidget {
                       icon!
                     ],
                   )
-                : Text(text),
+                : Text(text, style: TextStyle(fontSize: 22)),
           )),
     );
   }
