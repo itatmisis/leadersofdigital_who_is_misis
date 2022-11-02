@@ -10,7 +10,7 @@ class Organization(db.Model):
 
     oid = Column(Integer, primary_key=True)
 
-    point = Column(Geometry(geometry_type="POINT"))
+    point = Column(Geometry(geometry_type="POINT"), index=True)
 
-    name = Column(String(255))
+    name = Column(String(255), index=True)
     kol_mest = Column(Integer)
