@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/presentation/screens/main_screen/main_screen.dart';
-import 'package:mapbox_gl/mapbox_gl.dart';
-
-import 'presentation/screens/topbar_screen/topbar_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,9 +15,10 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        fontFamily: GoogleFonts.inter().fontFamily
       ),
       debugShowCheckedModeBanner: false,
-      home: const TopbarScreen(),
+      home: const MainScreen(),
     );
   }
 }
