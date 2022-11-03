@@ -21,49 +21,26 @@ class MapWidget extends StatelessWidget {
         CameraUpdate.zoomTo(controller.cameraPosition!.zoom - 1));
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
         MapboxMap(
+          cameraTargetBounds: CameraTargetBounds(LatLngBounds(
+            northeast: LatLng(56.28408249081925, 38.17401410295989),
+            southwest: LatLng(55.37949118840644, 36.75537470776375),
+          )),
           compassEnabled: false,
           accessToken:
-          'pk.eyJ1IjoicGl0dXNhbm9uaW1vdXMiLCJhIjoiY2twcHk5M2VtMDZvZjJ2bzEzMHNhNDM1diJ9.8BLcJknh8FvUVLJRZbHJDQ',
+              'pk.eyJ1IjoicGl0dXNhbm9uaW1vdXMiLCJhIjoiY2twcHk5M2VtMDZvZjJ2bzEzMHNhNDM1diJ9.8BLcJknh8FvUVLJRZbHJDQ',
           styleString:
-          'mapbox://styles/pitusanonimous/ckpq0eydh0tk318mr0dcw773k',
+              'mapbox://styles/pitusanonimous/ckpq0eydh0tk318mr0dcw773k',
           initialCameraPosition: const CameraPosition(
             zoom: 12.0,
-            target: LatLng(-33.86711, 151.1947171),
+            target: LatLng(55.75110596550744, 37.609532416801954),
           ),
           onMapCreated: (MapboxMapController c) {
             controller = c;
-          },
-          onCameraIdle: () {
-            if (onDrawed) return;
-            onDrawed = true;
-            controller.addFill(
-              const FillOptions(
-                geometry: [
-                  [
-                    LatLng(-33.719, 151.150),
-                    LatLng(-33.858, 151.150),
-                    LatLng(-33.866, 151.401),
-                    LatLng(-33.747, 151.328),
-                    LatLng(-33.719, 151.150),
-                  ],
-                  [
-                    LatLng(-33.762, 151.250),
-                    LatLng(-33.827, 151.250),
-                    LatLng(-33.833, 151.347),
-                    LatLng(-33.762, 151.250),
-                  ]
-                ],
-                fillColor: "#FF0000",
-                fillOutlineColor: "#FF0000",
-                fillOpacity: 0.3,
-              ),
-            );
           },
           onStyleLoadedCallback: () {},
         ),
@@ -76,8 +53,7 @@ class MapWidget extends StatelessWidget {
                 children: [
                   PointerInterceptor(
                     child: PlusMinusWidget(
-                        onPlus: onCameraZoomPlus,
-                        onMinus: onCameraZoomMinus),
+                        onPlus: onCameraZoomPlus, onMinus: onCameraZoomMinus),
                   ),
                   const SizedBox(
                     height: 24,
@@ -101,5 +77,4 @@ class MapWidget extends StatelessWidget {
       ],
     );
   }
-
 }
