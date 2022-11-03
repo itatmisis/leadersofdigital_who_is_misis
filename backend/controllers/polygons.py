@@ -6,7 +6,7 @@ from backend.data.models import Land
 from backend.tools import coord_convert
 
 
-@app.route("/api/<string:entity>/get_polygons")
+@app.route("/api/<string:entity>/get_polygons")  # type: ignore
 def get_polygons_controller(entity: str):  # TODO: Заглушка
     """
     request json: {
@@ -23,7 +23,7 @@ def get_polygons_controller(entity: str):  # TODO: Заглушка
                     "oid": obj.oid,
                     "polygons": [
                         list(map(lambda p: converter._from_msk_to_wgs84(p.x, p.y)[::-1],
-                                 geoalchemy2.shape.to_shape(obj.points)))
+                                 geoalchemy2.shape.to_shape(obj.points)))  # type: ignore
                     ]
                 } for obj in db.session.query(Land).filter(Land.parts == [0]).limit(10)
             ]

@@ -1,12 +1,16 @@
 import os
 import time
-
 import openpyxl
 from shapely import geometry, wkt
 import shapefile
+from multiprocessing import Process
 from backend import db
 from backend.data.models import *
 from backend.data.models.start_ground import StartGround
+from backend.tools import coord_convert
+from alive_progress import alive_bar
+
+converter = coord_convert.CoordConverter()
 
 DATASET_PATHS = {
     "lands": "ЗУ/Земельные_участки.shp",
@@ -21,6 +25,7 @@ DATASET_PATHS = {
 TRUNCATE_TABLE = "TRUNCATE TABLE {}"
 YES = "Да"
 HABITABLE_STR = "жилое"
+
 
 
 def main(path_to_dataset, progress_output_stream=None):
@@ -59,39 +64,43 @@ def load_lands(path_to_dataset):  # ЗУ
     db.session.execute(TRUNCATE_TABLE.format(Land.__tablename__))
 
     reader = shapefile.Reader(os.path.join(path_to_dataset, DATASET_PATHS["lands"]), encoding="cp1251")
-    for shaperec in reader.shapeRecords():
-        obj = Land(
-            oid=shaperec.shape.oid,
-            parts=list(shaperec.shape.parts),
-            points=wkt.dumps(geometry.MultiPoint(shaperec.shape.points)),
-            bbox=wkt.dumps(geometry.box(*shaperec.shape.bbox)),
+    with alive_bar(len(reader.shapeRecords())) as bar:
+        for shaperec in reader.shapeRecords():
+            obj = Land(
+                oid=shaperec.shape.oid,
+                parts=list(shaperec.shape.parts),
+                points=wkt.dumps(geometry.MultiPoint(list(map(lambda p: converter._from_msk_to_wgs84(p[0], p[1])[::-1], shaperec.shape.points)))),
+                bbox=wkt.dumps(geometry.box(*shaperec.shape.bbox)),
 
-            cadnum=shaperec.record.DESCR,
-            address=shaperec.record.ADDRESS,
-            has_effect=shaperec.record.HAS_EFFECT,
-            property_t=shaperec.record.PROPERTY_T,
-            shape_area=shaperec.record.SHAPE_AREA
-        )
-        db.session.add(obj)
+                cadnum=shaperec.record.DESCR,
+                address=shaperec.record.ADDRESS,
+                has_effect=shaperec.record.HAS_EFFECT,
+                property_t=shaperec.record.PROPERTY_T,
+                shape_area=shaperec.record.SHAPE_AREA
+            )
+            db.session.add(obj)
+            bar()
     reader.close()
 
 
 def load_capital(path_to_dataset):  # ОКС
+
     db.session.execute(TRUNCATE_TABLE.format(CapitalConstructionWorks.__tablename__))
-
     reader = shapefile.Reader(os.path.join(path_to_dataset, DATASET_PATHS["capital"]), encoding="cp1251")
-    for shaperec in reader.shapeRecords():
-        obj = CapitalConstructionWorks(
-            oid=shaperec.shape.oid,
-            parts=list(shaperec.shape.parts),
-            points=wkt.dumps(geometry.MultiPoint(shaperec.shape.points)),
-            bbox=wkt.dumps(geometry.box(*shaperec.shape.bbox)),
+    with alive_bar(len(reader.shapeRecords())) as bar:
+        for shaperec in reader.shapeRecords():
+            obj = CapitalConstructionWorks(
+                oid=shaperec.shape.oid,
+                parts=list(shaperec.shape.parts),
+                points=wkt.dumps(geometry.MultiPoint(list(map(lambda p: converter._from_msk_to_wgs84(p[0], p[1])[::-1], shaperec.shape.points)))),
+                bbox=wkt.dumps(geometry.box(*shaperec.shape.bbox)),
 
-            cadnum=shaperec.record.cadnum,
-            address=shaperec.record.address,
-            area=shaperec.record.Area
-        )
-        db.session.add(obj)
+                cadnum=shaperec.record.cadnum,
+                address=shaperec.record.address,
+                area=shaperec.record.Area
+            )
+            db.session.add(obj)
+            bar()
     reader.close()
 
 
@@ -99,15 +108,17 @@ def load_organizations(path_to_dataset):  # Организации СВАО_СА
     db.session.execute(TRUNCATE_TABLE.format(Organization.__tablename__))
 
     reader = shapefile.Reader(os.path.join(path_to_dataset, DATASET_PATHS["organizations"]), encoding="cp1251")
-    for shaperec in reader.shapeRecords():
-        obj = Organization(
-            oid=shaperec.shape.oid,
-            point=wkt.dumps(geometry.Point(*shaperec.shape.points[0])),
+    with alive_bar(len(reader.shapeRecords())) as bar:
+        for shaperec in reader.shapeRecords():
+            obj = Organization(
+                oid=shaperec.shape.oid,
+                point=wkt.dumps(geometry.Point(*list(map(lambda p: converter._from_msk_to_wgs84(p[0], p[1])[::-1], shaperec.shape.points[:1])))),
 
-            name=shaperec.record.name,
-            kol_mest=shaperec.record.kol_mest
-        )
-        db.session.add(obj)
+                name=shaperec.record.name,
+                kol_mest=shaperec.record.kol_mest
+            )
+            db.session.add(obj)
+            bar()
     reader.close()
 
 
@@ -115,16 +126,18 @@ def load_protected_zones(path_to_dataset):  # Санитарно-защитны�
     db.session.execute(TRUNCATE_TABLE.format(SanitaryProtectedZone.__tablename__))
 
     reader = shapefile.Reader(os.path.join(path_to_dataset, DATASET_PATHS["protected_zones"]), encoding="cp1251")
-    for shaperec in reader.shapeRecords():
-        obj = SanitaryProtectedZone(
-            oid=shaperec.shape.oid,
-            parts=list(shaperec.shape.parts),
-            points=wkt.dumps(geometry.MultiPoint(shaperec.shape.points)),
-            bbox=wkt.dumps(geometry.box(*shaperec.shape.bbox)),
+    with alive_bar(len(reader.shapeRecords())) as bar:
+        for shaperec in reader.shapeRecords():
+            obj = SanitaryProtectedZone(
+                oid=shaperec.shape.oid,
+                parts=list(shaperec.shape.parts),
+                points=wkt.dumps(geometry.MultiPoint(list(map(lambda p: converter._from_msk_to_wgs84(p[0], p[1])[::-1], shaperec.shape.points)))),
+                bbox=wkt.dumps(geometry.box(*shaperec.shape.bbox)),
 
-            zone_type=shaperec.record.VID_ZOUIT
-        )
-        db.session.add(obj)
+                zone_type=shaperec.record.VID_ZOUIT
+            )
+            db.session.add(obj)
+            bar()
     reader.close()
 
 
@@ -132,17 +145,19 @@ def load_start_grounds(path_to_dataset):  # Стартовые площадки
     db.session.execute(TRUNCATE_TABLE.format(StartGround.__tablename__))
 
     reader = shapefile.Reader(os.path.join(path_to_dataset, DATASET_PATHS["start_grounds"]), encoding="cp1251")
-    for shaperec in reader.shapeRecords():
-        obj = StartGround(
-            oid=shaperec.shape.oid,
-            parts=list(shaperec.shape.parts),
-            points=wkt.dumps(geometry.MultiPoint(shaperec.shape.points)),
-            bbox=wkt.dumps(geometry.box(*shaperec.shape.bbox)),
+    with alive_bar(len(reader.shapeRecords())) as bar:
+        for shaperec in reader.shapeRecords():
+            obj = StartGround(
+                oid=shaperec.shape.oid,
+                parts=list(shaperec.shape.parts),
+                points=wkt.dumps(geometry.MultiPoint(list(map(lambda p: converter._from_msk_to_wgs84(p[0], p[1])[::-1], shaperec.shape.points)))),
+                bbox=wkt.dumps(geometry.box(*shaperec.shape.bbox)),
 
-            address=shaperec.record.address,
-            district=shaperec.record.rayon
-        )
-        db.session.add(obj)
+                address=shaperec.record.address,
+                district=shaperec.record.rayon
+            )
+            db.session.add(obj)
+            bar()
     reader.close()
 
 
@@ -150,19 +165,21 @@ def load_cultural_inheritance(path_to_dataset):  # Территории объе
     db.session.execute(TRUNCATE_TABLE.format(CulturalHeritage.__tablename__))
 
     reader = shapefile.Reader(os.path.join(path_to_dataset, DATASET_PATHS["cultural_inheritance"]), encoding="cp1251")
-    for shaperec in reader.shapeRecords():
-        obj = CulturalHeritage(
-            oid=shaperec.shape.oid,
-            parts=list(shaperec.shape.parts),
-            points=wkt.dumps(geometry.MultiPoint(shaperec.shape.points)),
-            bbox=wkt.dumps(geometry.box(*shaperec.shape.bbox)),
+    with alive_bar(len(reader.shapeRecords())) as bar:
+        for shaperec in reader.shapeRecords():
+            obj = CulturalHeritage(
+                oid=shaperec.shape.oid,
+                parts=list(shaperec.shape.parts),
+                points=wkt.dumps(geometry.MultiPoint(list(map(lambda p: converter._from_msk_to_wgs84(p[0], p[1])[::-1], shaperec.shape.points)))),
+                bbox=wkt.dumps(geometry.box(*shaperec.shape.bbox)),
 
-            name=shaperec.record.name,
-            number=shaperec.record.number,
-            object_id=shaperec.record.objectid
+                name=shaperec.record.name,
+                number=shaperec.record.number,
+                object_id=shaperec.record.objectid
 
-        )
-        db.session.add(obj)
+            )
+            db.session.add(obj)
+            bar()
     reader.close()
 
 
