@@ -42,7 +42,6 @@ class MapWidget extends StatelessWidget {
           onMapCreated: (MapboxMapController c) {
             controller = c;
           },
-          onStyleLoadedCallback: () {},
         ),
         Align(
             alignment: Alignment.centerRight,
@@ -60,17 +59,12 @@ class MapWidget extends StatelessWidget {
                   ),
                   PointerInterceptor(
                       child: SmallButton(
-                          icon: "assets/icons/layers.svg",
+                          icon: "assets/icons/straighten.svg",
                           color: AppColors.neutral800,
                           onPressed: () {})),
                   const SizedBox(
                     height: 24,
                   ),
-                  PointerInterceptor(
-                      child: SmallButton(
-                          icon: "assets/icons/settings.svg",
-                          color: AppColors.neutral800,
-                          onPressed: () {})),
                 ],
               ),
             )),
