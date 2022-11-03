@@ -1,14 +1,15 @@
 import os
 import time
+
 import openpyxl
-from shapely import geometry, wkt
 import shapefile
-from multiprocessing import Process
+from alive_progress import alive_bar
+from shapely import geometry, wkt
+
 from backend import db
 from backend.data.models import *
 from backend.data.models.start_ground import StartGround
 from backend.tools import coord_convert
-from alive_progress import alive_bar
 
 converter = coord_convert.CoordConverter()
 
@@ -25,7 +26,6 @@ DATASET_PATHS = {
 TRUNCATE_TABLE = "TRUNCATE TABLE {}"
 YES = "Да"
 HABITABLE_STR = "жилое"
-
 
 
 def main(path_to_dataset, progress_output_stream=None):
@@ -60,6 +60,16 @@ def main(path_to_dataset, progress_output_stream=None):
     db.session.commit()
 
 
+def convert_bbox(x1, y1, x2, y2):
+    x1, y1 = converter.transform(x1, y1, coord_convert.CRS_MSK)
+    x2, y2 = converter.transform(x2, y2, coord_convert.CRS_MSK)
+    return y1, x1, y2, x2
+
+
+def convert_multipoint(points):
+    return list(map(lambda p: converter.transform(p[0], p[1], coord_convert.CRS_MSK)[::-1], points))
+
+
 def load_lands(path_to_dataset):  # ЗУ
     db.session.execute(TRUNCATE_TABLE.format(Land.__tablename__))
 
@@ -69,8 +79,8 @@ def load_lands(path_to_dataset):  # ЗУ
             obj = Land(
                 oid=shaperec.shape.oid,
                 parts=list(shaperec.shape.parts),
-                points=wkt.dumps(geometry.MultiPoint(list(map(lambda p: converter._from_msk_to_wgs84(p[0], p[1])[::-1], shaperec.shape.points)))),
-                bbox=wkt.dumps(geometry.box(*shaperec.shape.bbox)),
+                points=wkt.dumps(geometry.MultiPoint(convert_multipoint(shaperec.shape.points))),
+                bbox=wkt.dumps(geometry.box(*convert_bbox(*shaperec.shape.bbox))),
 
                 cadnum=shaperec.record.DESCR,
                 address=shaperec.record.ADDRESS,
@@ -92,8 +102,8 @@ def load_capital(path_to_dataset):  # ОКС
             obj = CapitalConstructionWorks(
                 oid=shaperec.shape.oid,
                 parts=list(shaperec.shape.parts),
-                points=wkt.dumps(geometry.MultiPoint(list(map(lambda p: converter._from_msk_to_wgs84(p[0], p[1])[::-1], shaperec.shape.points)))),
-                bbox=wkt.dumps(geometry.box(*shaperec.shape.bbox)),
+                points=wkt.dumps(geometry.MultiPoint(convert_multipoint(shaperec.shape.points))),
+                bbox=wkt.dumps(geometry.box(*convert_bbox(*shaperec.shape.bbox))),
 
                 cadnum=shaperec.record.cadnum,
                 address=shaperec.record.address,
@@ -112,7 +122,7 @@ def load_organizations(path_to_dataset):  # Организации СВАО_СА
         for shaperec in reader.shapeRecords():
             obj = Organization(
                 oid=shaperec.shape.oid,
-                point=wkt.dumps(geometry.Point(*list(map(lambda p: converter._from_msk_to_wgs84(p[0], p[1])[::-1], shaperec.shape.points[:1])))),
+                point=wkt.dumps(geometry.Point(converter.transform(*shaperec.shape.points[0], coord_convert.CRS_MSK))),
 
                 name=shaperec.record.name,
                 kol_mest=shaperec.record.kol_mest
@@ -131,8 +141,8 @@ def load_protected_zones(path_to_dataset):  # Санитарно-защитны�
             obj = SanitaryProtectedZone(
                 oid=shaperec.shape.oid,
                 parts=list(shaperec.shape.parts),
-                points=wkt.dumps(geometry.MultiPoint(list(map(lambda p: converter._from_msk_to_wgs84(p[0], p[1])[::-1], shaperec.shape.points)))),
-                bbox=wkt.dumps(geometry.box(*shaperec.shape.bbox)),
+                points=wkt.dumps(geometry.MultiPoint(convert_multipoint(shaperec.shape.points))),
+                bbox=wkt.dumps(geometry.box(*convert_bbox(*shaperec.shape.bbox))),
 
                 zone_type=shaperec.record.VID_ZOUIT
             )
@@ -150,8 +160,8 @@ def load_start_grounds(path_to_dataset):  # Стартовые площадки
             obj = StartGround(
                 oid=shaperec.shape.oid,
                 parts=list(shaperec.shape.parts),
-                points=wkt.dumps(geometry.MultiPoint(list(map(lambda p: converter._from_msk_to_wgs84(p[0], p[1])[::-1], shaperec.shape.points)))),
-                bbox=wkt.dumps(geometry.box(*shaperec.shape.bbox)),
+                points=wkt.dumps(geometry.MultiPoint(convert_multipoint(shaperec.shape.points))),
+                bbox=wkt.dumps(geometry.box(*convert_bbox(*shaperec.shape.bbox))),
 
                 address=shaperec.record.address,
                 district=shaperec.record.rayon
@@ -170,8 +180,8 @@ def load_cultural_inheritance(path_to_dataset):  # Территории объе
             obj = CulturalHeritage(
                 oid=shaperec.shape.oid,
                 parts=list(shaperec.shape.parts),
-                points=wkt.dumps(geometry.MultiPoint(list(map(lambda p: converter._from_msk_to_wgs84(p[0], p[1])[::-1], shaperec.shape.points)))),
-                bbox=wkt.dumps(geometry.box(*shaperec.shape.bbox)),
+                points=wkt.dumps(geometry.MultiPoint(convert_multipoint(shaperec.shape.points))),
+                bbox=wkt.dumps(geometry.box(*convert_bbox(*shaperec.shape.bbox))),
 
                 name=shaperec.record.name,
                 number=shaperec.record.number,
