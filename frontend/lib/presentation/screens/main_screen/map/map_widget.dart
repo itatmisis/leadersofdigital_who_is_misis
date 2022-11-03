@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/data/api/api.dart';
 import 'package:frontend/presentation/screens/main_screen/map/plus_minus.dart';
 import 'package:frontend/presentation/theme/app_colors.dart';
 import 'package:frontend/presentation/widgets/small_button.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 
-class MapWidget extends StatelessWidget {
+class MapWidget extends StatefulWidget {
   MapWidget({super.key});
 
+  @override
+  State<MapWidget> createState() => _MapWidgetState();
+}
+
+class _MapWidgetState extends State<MapWidget> {
   late MapboxMapController controller;
+
   bool onDrawed = false;
 
   void onCameraZoomPlus() {
@@ -19,6 +26,30 @@ class MapWidget extends StatelessWidget {
   void onCameraZoomMinus() {
     controller.animateCamera(
         CameraUpdate.zoomTo(controller.cameraPosition!.zoom - 1));
+  }
+
+  void drawPolygonsFromServer() async {
+    final polygons = await Api().getPolygons();
+
+    Map<int, FillOptions> mapPolygons = {};
+
+    //late LatLng l;
+    for (var p in polygons) {
+      List<LatLng> geometry = [];
+      for (var g in p['polygons'][0]) {
+        //l = LatLng(g[0], g[1]);
+        geometry.add(LatLng(g[0], g[1]));
+      }
+      mapPolygons[p['oid']] = FillOptions(geometry: [geometry], fillColor: '#8B559B', fillOutlineColor: '#8B559B', fillOpacity: 0.7);
+    }
+    //controller.moveCamera(CameraUpdate.newCameraPosition(CameraPosition(target: l, zoom: 15)));
+    controller.addFills(mapPolygons.values.toList());
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -41,6 +72,10 @@ class MapWidget extends StatelessWidget {
           ),
           onMapCreated: (MapboxMapController c) {
             controller = c;
+          },
+
+          onStyleLoadedCallback: () {
+            drawPolygonsFromServer();
           },
         ),
         Align(
