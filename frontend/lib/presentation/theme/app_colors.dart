@@ -23,8 +23,8 @@ class AppColors {
   static const Color veryPeri600 = Color(0xFF6162A8);
   static const Color veryPeri500 = Color(0xFF6667AB);
   static const Color veryPeri400 = Color(0xFF7B7CB7);
-  static const Color veryPeri300 = Color(0xFF8989BE);
-  static const Color veryPeri200 = Color(0xFF9697C5);
+  static const Color veryPeri300 = Color(0xFFBDBEDB);
+  static const Color veryPeri200 = Color(0xFFE4E4F0);
   static const Color veryPeri100 = Color(0xFFA3A4CC);
 
   static const Color eggshellBlue900 = Color(0xFF478581);

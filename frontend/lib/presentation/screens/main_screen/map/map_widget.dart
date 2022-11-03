@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/data/api/api.dart';
 import 'package:frontend/presentation/screens/main_screen/map/plus_minus.dart';
+import 'package:frontend/presentation/screens/main_screen/sidebar/side_bar.dart';
 import 'package:frontend/presentation/theme/app_colors.dart';
 import 'package:frontend/presentation/widgets/small_button.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
@@ -58,8 +59,8 @@ class _MapWidgetState extends State<MapWidget> {
       children: [
         MapboxMap(
           cameraTargetBounds: CameraTargetBounds(LatLngBounds(
-            northeast: LatLng(56.28408249081925, 38.17401410295989),
-            southwest: LatLng(55.37949118840644, 36.75537470776375),
+            northeast: const LatLng(56.28408249081925, 38.17401410295989),
+            southwest: const LatLng(55.37949118840644, 36.75537470776375),
           )),
           compassEnabled: false,
           accessToken:
@@ -79,30 +80,36 @@ class _MapWidgetState extends State<MapWidget> {
           },
         ),
         Align(
-            alignment: Alignment.centerRight,
-            child: Padding(
-              padding: EdgeInsets.only(right: 10),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  PointerInterceptor(
-                    child: PlusMinusWidget(
-                        onPlus: onCameraZoomPlus, onMinus: onCameraZoomMinus),
-                  ),
-                  const SizedBox(
-                    height: 24,
-                  ),
-                  PointerInterceptor(
-                      child: SmallButton(
-                          icon: "assets/icons/straighten.svg",
-                          color: AppColors.neutral800,
-                          onPressed: () {})),
-                  const SizedBox(
-                    height: 24,
-                  ),
-                ],
-              ),
-            )),
+          alignment: Alignment.centerRight,
+          child: Padding(
+            padding: const EdgeInsets.only(right: 10),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                PointerInterceptor(
+                  child: PlusMinusWidget(
+                      onPlus: onCameraZoomPlus, onMinus: onCameraZoomMinus),
+                ),
+                const SizedBox(
+                  height: 24,
+                ),
+                PointerInterceptor(
+                    child: SmallButton(
+                        icon: "assets/icons/straighten.svg",
+                        color: AppColors.neutral800,
+                        onPressed: () {})),
+                const SizedBox(
+                  height: 24,
+                ),
+              ],
+            ),
+          ),
+        ),
+        const Positioned(
+          left: 0,
+          top: 0,
+          child: SideBar(),
+        ),
       ],
     );
   }

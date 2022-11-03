@@ -13,7 +13,6 @@ class Api {
   Api._newInstance() {
     final dio = Dio(BaseOptions(
       baseUrl: 'http://89.108.102.188:5000',
-
       connectTimeout: 10000,
     ));
     dio.interceptors.add(ErrorInterceptor());
