@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/presentation/screens/main_screen/main_screen.dart';
-import 'package:mapbox_gl/mapbox_gl.dart';
-
-import 'presentation/screens/topbar_screen/topbar_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -19,7 +16,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       debugShowCheckedModeBanner: false,
-      home: const TopbarScreen(),
+      home: const MainScreen(),
     );
   }
 }
