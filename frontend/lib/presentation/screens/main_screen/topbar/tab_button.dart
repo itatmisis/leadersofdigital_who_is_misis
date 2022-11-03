@@ -17,7 +17,7 @@ class TabButton extends StatelessWidget {
     return TextButton(
       onPressed: onPressed,
       child: Padding(
-        padding: EdgeInsets.only(left: 10, right: 10, top: topPadding, bottom: 10),
+        padding: EdgeInsets.only(left: 6, right: 6, top: topPadding, bottom: 10),
         child: Column(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
