@@ -10,7 +10,6 @@ class AppColors {
   static const Color neutral300 = Color(0xFFE2E2E2);
   static const Color neutral200 = Color(0xFFECECEC);
   static const Color neutral100 = Color(0xFFF9F9F9);
-  static const Color neutralWhite = Color(0xFFFFFFFF);
 
   static const Color ultraBlack = Color(0xFF000000);
   static const Color white = Color(0xFFFFFFFF);

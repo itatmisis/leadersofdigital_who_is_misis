@@ -23,10 +23,9 @@ class SmallButton extends StatelessWidget {
         onTap: onPressed,
         child: Container(
           decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              color: AppColors.neutralWhite),
+              borderRadius: BorderRadius.circular(8), color: AppColors.white),
           child: Padding(
-            padding: EdgeInsets.all(12),
+            padding: const EdgeInsets.all(12),
             child: SvgPicture.asset(
               icon,
               height: 20,
