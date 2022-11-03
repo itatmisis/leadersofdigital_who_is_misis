@@ -8,9 +8,11 @@ class Search extends StatelessWidget {
   final Color _backgroundColor;
   final double _elevation;
 
-  const Search.v1({super.key}): _backgroundColor = AppColors.white, _elevation = 3;
-  const Search.v2({super.key}): _backgroundColor = AppColors.neutral200, _elevation = 3;
-  const Search.v3({super.key}): _backgroundColor = AppColors.neutral100, _elevation = 1;
+  final Function(String)? onSubmitted;
+
+  const Search.v1({super.key, this.onSubmitted}): _backgroundColor = AppColors.white, _elevation = 3;
+  const Search.v2({super.key, this.onSubmitted}): _backgroundColor = AppColors.neutral200, _elevation = 3;
+  const Search.v3({super.key, this.onSubmitted}): _backgroundColor = AppColors.neutral100, _elevation = 1;
 
   @override
   Widget build(BuildContext context) {
@@ -18,6 +20,7 @@ class Search extends StatelessWidget {
       elevation: _elevation,
       borderRadius: BorderRadius.circular(8),
       child: TextField(
+        onSubmitted: onSubmitted,
         decoration: InputDecoration(
             isDense: true,
             filled: true,
