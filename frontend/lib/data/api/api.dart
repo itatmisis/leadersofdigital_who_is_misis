@@ -9,7 +9,7 @@ class Api {
 
   Api() {
     final dio = Dio(BaseOptions(
-      baseUrl: 'https://http://89.108.102.188:5000',
+      baseUrl: 'http://89.108.102.188:5000',
       connectTimeout: 10000,
     ));
     dio.interceptors.add(ErrorInterceptor());
