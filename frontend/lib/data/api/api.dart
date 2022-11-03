@@ -7,7 +7,10 @@ import 'package:frontend/data/interceptors/error_interceptor.dart';
 class Api {
   late Dio _client;
 
-  Api() {
+  static final Api _instance = Api._newInstance();
+  factory Api() => _instance;
+
+  Api._newInstance() {
     final dio = Dio(BaseOptions(
       baseUrl: 'http://89.108.102.188:5000',
       connectTimeout: 10000,
@@ -16,9 +19,8 @@ class Api {
     _client = dio;
   }
 
-  Future<String> getPolygons() async {
+  Future<List> getPolygons() async {
     final response = await _client.get(ApiRoutes.getPolygons);
-    final json = jsonDecode(response.data);
-    return json;
+    return response.data['lands'];
   }
 }
