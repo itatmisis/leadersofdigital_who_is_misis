@@ -11,8 +11,8 @@ class Land(db.Model):
     oid = Column(Integer, primary_key=True)
 
     parts = Column(ARRAY(Integer))
-    points = Column(Geometry(geometry_type="MULTIPOINT"), index=True)
-    bbox = Column(Geometry(geometry_type="POLYGON"), index=True)
+    points = Column(Geometry(geometry_type="MULTIPOINT"))
+    bbox = Column(Geometry(geometry_type="POLYGON"))
 
     cadnum = Column(String(80), index=True)
     address = Column(String(255), index=True)

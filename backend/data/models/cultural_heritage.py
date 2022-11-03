@@ -12,8 +12,8 @@ class CulturalHeritage(db.Model):
 
     oid = Column(Integer, primary_key=True)
     parts = Column(ARRAY(Integer))
-    points = Column(Geometry(geometry_type="MULTIPOINT"), index=True)
-    bbox = Column(Geometry(geometry_type="POLYGON"), index=True)
+    points = Column(Geometry(geometry_type="MULTIPOINT"))
+    bbox = Column(Geometry(geometry_type="POLYGON"))
 
     name = Column(String(127))
     number = Column(String(80))  # all entries from dataset were 'None'
