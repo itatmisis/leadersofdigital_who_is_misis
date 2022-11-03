@@ -22,7 +22,7 @@ def get_polygons_controller(entity: str):  # TODO: Заглушка
                 {
                     "oid": obj.oid,
                     "polygons": [
-                        list(map(lambda p: converter._from_msk_to_wgs84(p.x, p.y),
+                        list(map(lambda p: converter._from_msk_to_wgs84(p.x, p.y)[::-1],
                                  geoalchemy2.shape.to_shape(obj.points)))
                     ]
                 } for obj in db.session.query(Land).filter(Land.parts == [0]).limit(10)
