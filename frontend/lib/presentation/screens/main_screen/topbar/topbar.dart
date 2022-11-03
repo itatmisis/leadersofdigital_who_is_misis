@@ -36,7 +36,7 @@ class Topbar extends StatelessWidget {
                 Flexible(child: TabButton(icon: 'assets/icons/layers.svg', text: 'Слои')),
                 Flexible(child: TabButton(icon: 'assets/icons/configurator.svg', text: 'Конфигуратор')),
                 Flexible(child: TabButton(icon: 'assets/icons/import.svg', text: 'Импорт')),
-                SizedBox(width: 10,)
+                Flexible(child: TabButton(icon: 'assets/icons/export.svg', text: 'Экспорт')),
               ],
             ),
           )
