@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 extension LogicSize on num {
   static const double _scaleFactor = 0.8;
