@@ -25,71 +25,73 @@ class SideBar extends StatelessWidget {
       Criterion("Дата внесения сведений","11.01.2022"),
     ];
 
-    final double height = MediaQuery.of(context).size.height-60;
-    final double width = MediaQuery.of(context).size.width;
     return Container(
       color: AppColors.white,
-      height: height,
-      width: width / 4,
-      child: Padding(
-        padding: const EdgeInsets.all(40),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(
-              height: 40,
-            ),
-            Row(
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("77:01:0002009:29", style: AppFonts.heading1),
-                    Text("Земельный участок",
-                        style:
-                            AppFonts.subtitle1.copyWith(color: AppColors.gray)),
-                  ],
-                ),
-                SvgPicture.asset("assets/icons/bookmark_border.svg"),
-              ],
-            ),
-            const SizedBox(
-              height: 40,
-            ),
-            Row(
-              children: const [
-                Expanded(
-                  child: PurpleContainer(
-                      heading: "Площадь:", subtitle: "1184 кв.м"),
-                ),
-                SizedBox(width: 32),
-                Expanded(
-                  child: PurpleContainer(heading: "Объектов:", subtitle: "3"),
-                ),
-              ],
-            ),
-            SizedBox(height: 40),
-            Expanded(child: InformationWidget(data: data)),
-            const SizedBox(height: 40),
-            Text(
-              "Документы:",
-              style: AppFonts.heading2,
-            ),
-            const SizedBox(height: 24),
-            const DocumentTitle(
-              title: "Планы",
-            ),
-            const SizedBox(height: 16),
-            const DocumentTitle(
-              title: "Акты обследования",
-            ),
-            const SizedBox(height: 16),
-            const DocumentTitle(
-              title: "Документ",
-            ),
-          ],
-        ),
-      ),
+      height: double.infinity,
+      width: 450,
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.all(40),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(
+                height: 40,
+              ),
+              Row(
+                children: [
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("77:01:0002009:29", style: AppFonts.heading1),
+                      Text("Земельный участок",
+                          style:
+                          AppFonts.subtitle1.copyWith(color: AppColors.gray)),
+                    ],
+                  ),
+                  SvgPicture.asset("assets/icons/bookmark_border.svg"),
+                ],
+              ),
+              const SizedBox(
+                height: 40,
+              ),
+              Row(
+                children: const [
+                  Expanded(
+                    child: PurpleContainer(
+                        heading: "Площадь:", subtitle: "1184 кв.м"),
+                  ),
+                  SizedBox(width: 32),
+                  Expanded(
+                    child: PurpleContainer(heading: "Объектов:", subtitle: "3"),
+                  ),
+                ],
+              ),
+              SizedBox(height: 40),
+              InformationWidget(data: data),
+              const SizedBox(height: 40),
+              Text(
+                "Документы:",
+                style: AppFonts.heading2,
+              ),
+              const SizedBox(height: 24),
+              const DocumentTitle(
+                title: "Планы",
+              ),
+              const SizedBox(height: 16),
+              const DocumentTitle(
+                title: "Акты обследования",
+              ),
+              const SizedBox(height: 16),
+              const DocumentTitle(
+                title: "Документ",
+              ),
+            ],
+          ),
+        )
+      )
     );
   }
 }

@@ -105,11 +105,6 @@ class _MapWidgetState extends State<MapWidget> {
             ),
           ),
         ),
-        const Positioned(
-          left: 0,
-          top: 0,
-          child: SideBar(),
-        ),
       ],
     );
   }
