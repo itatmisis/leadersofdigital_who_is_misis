@@ -52,6 +52,7 @@ class InformationWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
       ),
       child: ListView.builder(
+        shrinkWrap: true,
         itemCount: data.length,
         itemBuilder: (BuildContext context, int index) {
           if (index == 0) {

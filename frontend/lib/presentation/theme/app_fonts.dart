@@ -9,11 +9,11 @@ extension LogicSize on num {
 }
 
 class AppFonts {
-  static final TextStyle heading1 = TextStyle(fontSize: 64.sc, fontWeight: FontWeight.w700, color: AppColors.black);
-  static final TextStyle heading2 = TextStyle(fontSize: 48.sc, fontWeight: FontWeight.w700, color: AppColors.black);
-  static final TextStyle heading3 = TextStyle(fontSize: 32.sc, fontWeight: FontWeight.w500, color: AppColors.black);
+  static final TextStyle heading1 = TextStyle(fontSize: 32.sc, fontWeight: FontWeight.w700, color: AppColors.black);
+  static final TextStyle heading2 = TextStyle(fontSize: 28.sc, fontWeight: FontWeight.w700, color: AppColors.black);
+  static final TextStyle heading3 = TextStyle(fontSize: 24.sc, fontWeight: FontWeight.w500, color: AppColors.black);
 
-  static final TextStyle subtitle1 = TextStyle(fontSize: 32.sc, fontWeight: FontWeight.w400, color: AppColors.black);
+  static final TextStyle subtitle1 = TextStyle(fontSize: 20.sc, fontWeight: FontWeight.w400, color: AppColors.black);
   static final TextStyle subtitle2 = TextStyle(fontSize: 18.sc, fontWeight: FontWeight.w700, color: AppColors.black);
 
   static final TextStyle body1SemiBold = TextStyle(fontSize: 18.sc, fontWeight: FontWeight.w600, color: AppColors.black);
