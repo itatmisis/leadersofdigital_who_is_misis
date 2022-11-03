@@ -13,10 +13,12 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: Drawer(
+      ),
       body: Center(
           child: Column(
             children: [
-              Topbar(),
+              const Topbar(),
               Expanded(child: MapWidget())
             ],
           )
