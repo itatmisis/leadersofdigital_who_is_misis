@@ -22,6 +22,7 @@ dependencies:
   pointer_interceptor: ^0.9.3+3
   google_fonts: any
   dio: ^4.0.6
+  flutter_bloc: any
 
 dev_dependencies:
   flutter_test:
