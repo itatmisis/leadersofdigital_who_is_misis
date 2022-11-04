@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/domain/models/area_model.dart';
 import 'package:frontend/presentation/screens/main_screen/bloc/polygon_loader_cubit.dart';
 import 'package:frontend/presentation/screens/main_screen/bloc/sidebar_cubit.dart';
+import 'package:frontend/presentation/screens/main_screen/layers_bar/layers_bar.dart';
 import 'package:frontend/presentation/screens/main_screen/widgets/loader.dart';
 import 'package:frontend/presentation/screens/main_screen/map/map_widget.dart';
 import 'package:frontend/presentation/screens/main_screen/topbar/topbar.dart';
@@ -19,45 +20,47 @@ class MainScreen extends StatelessWidget {
     return Scaffold(
       body: Center(
           child: Stack(
+        children: [
+          Column(
             children: [
-              Column(
-                children: [
-                  const Topbar(),
-                  Expanded(
-                      child: LayoutBuilder(
-                        builder: (_, c) => Stack(
-                          children: [
-                            MapWidget(),
-                            BlocBuilder<SidebarCubit, AreaModel?>(
-                                builder: (_, m) =>
-                                    AnimatedPositioned(
-                                      top: 0,
-                                      left: m != null ? 0 : -450,
-                                      height: c.maxHeight,
-                                      duration: const Duration(milliseconds: 200),
-                                      child: PointerInterceptor(
-                                        child: SideBar(),
-                                      ),
-                                    )
-                            )
-                          ],
-                        )
-                      )
-                  ),
-                ],
-              ),
-              BlocBuilder<PolygonLoaderCubit, Map?>(
-                  builder: (_, data) =>
-                      PointerInterceptor(
-                        child: AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 100),
-                            child: data == null ? Loader() : const SizedBox()
+              const Topbar(),
+              Expanded(
+                child: LayoutBuilder(
+                  builder: (_, c) => Stack(
+                    children: [
+                      MapWidget(),
+                      BlocBuilder<SidebarCubit, AreaModel?>(
+                        builder: (_, m) => AnimatedPositioned(
+                          top: 0,
+                          left: m != null ? 0 : -450,
+                          height: c.maxHeight,
+                          duration: const Duration(milliseconds: 200),
+                          child: PointerInterceptor(
+                            child: SideBar(),
+                          ),
                         ),
-                      )
-              )
+                      ),
+                      Positioned(
+                        top: 0,
+                        right: 0,
+                        child: PointerInterceptor(
+                          child: LayersBar(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
-          )
-      ),
+          ),
+          BlocBuilder<PolygonLoaderCubit, Map?>(
+              builder: (_, data) => PointerInterceptor(
+                    child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 100),
+                        child: data == null ? Loader() : const SizedBox()),
+                  ))
+        ],
+      )),
     );
   }
 }

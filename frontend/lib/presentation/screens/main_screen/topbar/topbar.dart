@@ -33,7 +33,7 @@ class Topbar extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: const [
                 VerticalDivider(indent: 10, endIndent: 10, color: AppColors.neutral400, width: 1,),
-                Flexible(child: TabButton(icon: 'assets/icons/layers.svg', text: 'Слои')),
+                Flexible(child: TabButton(icon: 'assets/icons/layers.svg', text: 'Слои',)),
                 Flexible(child: TabButton(icon: 'assets/icons/configurator.svg', text: 'Конфигуратор')),
                 Flexible(child: TabButton(icon: 'assets/icons/import.svg', text: 'Импорт')),
                 Flexible(child: TabButton(icon: 'assets/icons/export.svg', text: 'Экспорт')),

@@ -7,4 +7,5 @@ class SidebarCubit extends Cubit<AreaModel?> {
   void setCurrentArea(AreaModel? areaModel) {
     emit(areaModel);
   }
+
 }
