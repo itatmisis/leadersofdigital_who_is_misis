@@ -31,7 +31,7 @@ class SideBar extends StatelessWidget {
       width: 450,
       child: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.all(40),
+          padding: const EdgeInsets.all(40),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -40,6 +40,7 @@ class SideBar extends StatelessWidget {
                 height: 40,
               ),
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Column(
                     mainAxisSize: MainAxisSize.min,
@@ -51,7 +52,7 @@ class SideBar extends StatelessWidget {
                           AppFonts.subtitle1.copyWith(color: AppColors.gray)),
                     ],
                   ),
-                  SvgPicture.asset("assets/icons/bookmark_border.svg"),
+                  const Icon(Icons.bookmark_border_rounded, color: AppColors.black,),
                 ],
               ),
               const SizedBox(
@@ -69,7 +70,7 @@ class SideBar extends StatelessWidget {
                   ),
                 ],
               ),
-              SizedBox(height: 40),
+              const SizedBox(height: 40),
               InformationWidget(data: data),
               const SizedBox(height: 40),
               Text(
