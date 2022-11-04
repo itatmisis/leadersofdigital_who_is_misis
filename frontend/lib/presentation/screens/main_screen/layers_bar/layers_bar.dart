@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/presentation/screens/main_screen/layers_bar/widgets/list_view_element.dart';
 import 'package:frontend/presentation/theme/app_colors.dart';
 
 class LayersBar extends StatelessWidget {
-  const LayersBar({Key? key}) : super(key: key);
-
+  LayersBar({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     final List<String> layers = [
@@ -77,18 +77,7 @@ class LayersBar extends StatelessWidget {
             ListView.builder(
               shrinkWrap: true,
               itemBuilder: (context, index) {
-                return Row(
-                  children: [
-                    Checkbox(
-                      value: true,
-                      onChanged: (value) {},
-                    ),
-                    const SizedBox(
-                      width: 16,
-                    ),
-                    Text(layers[index]),
-                  ],
-                );
+                return ListViewElement(index: index, layers: layers);
               },
               itemCount: layers.length,
             ),

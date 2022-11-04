@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:dio/dio.dart';
 import 'package:frontend/data/api/api_routes/api_routes.dart';
@@ -21,6 +22,7 @@ class Api {
 
   Future<List> getPolygons() async {
     final response = await _client.get(ApiRoutes.getPolygons);
+    log(response.data['lands']);
     return response.data['lands'];
   }
 }

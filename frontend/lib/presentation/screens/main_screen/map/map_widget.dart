@@ -21,11 +21,11 @@ class _MapWidgetState extends State<MapWidget> {
   MapboxMapController? controller;
 
   bool onDrawed = false;
-  
+
   @override
   void initState() {
     super.initState();
-    context.read<PolygonLoaderCubit>().stream.listen((Map<int, AreaModel>? event) {;
+    context.read<PolygonLoaderCubit>().stream.listen((Map<int, AreaModel>? event) {
       if (controller != null && event != null) {
         controller!.clearFills();
 

@@ -1,3 +1,4 @@
 class ApiRoutes {
-  static const getPolygons = '/api/lands/get_polygons';
+  static const getLands = '/api/lands/polygons';
+  static const getCapitalConstructionWorks = '/api/lands/polygons';
 }
