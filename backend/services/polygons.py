@@ -1,4 +1,7 @@
-from backend import db
+import json
+import os.path
+
+from backend import db, app
 from backend.data.models.base_polygonal_model import BasePolygonalModel
 import shapely.geometry
 import geoalchemy2.shape
@@ -6,16 +9,31 @@ import geoalchemy2.shape
 from backend.services import entities
 
 
-def get_all_polygons(entity: str) -> list[BasePolygonalModel]:
+def get_all_polygons_json(entity: str) -> str:  # returns json-dump
     if not entities.PolygonalEntityManager.is_valid(entity):
         raise ValueError(f"Entity {entity} doesn't exist")
 
-    objects = db.session.query(entities.PolygonalEntityManager.get_model(entity)).all()
+    file_path = os.path.join(app.config["PREPROCESSED_DATA_PATH"], entity + ".json")
+    if os.path.exists(file_path):
+        with open(file_path) as file:
+            return file.read()
+    else:
+        objects = get_all_polygons(entities.PolygonalEntityManager.get_model(entity))
+        data_json = dict()
+        data_json[entity] = serialize_polygons(objects)
+        with open(file_path, "w") as file:
+            dump = json.dumps(data_json)
+            file.write(dump)
+            return dump
+
+
+def get_all_polygons(entity: BasePolygonalModel) -> list[BasePolygonalModel]:
+    objects = db.session.query(entity).all()
     return objects
 
 
 def serialize_polygons(objects: list[BasePolygonalModel]):
-    json = [
+    data_json = [
         {
             "oid": obj.oid,
             "polygons": [
@@ -27,7 +45,7 @@ def serialize_polygons(objects: list[BasePolygonalModel]):
             ]
         } for obj in objects
     ]
-    return json
+    return data_json
 
 
 def serialize_point(point: shapely.geometry.Point):

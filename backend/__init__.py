@@ -17,6 +17,7 @@ if os.environ.get("DEBUG") == "true":
     cors = flask_cors.CORS(app)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DB_URL")
+app.config["PREPROCESSED_DATA_PATH"] = "backend/data/preprocessed"
 
 db = SQLAlchemy(app)
 
