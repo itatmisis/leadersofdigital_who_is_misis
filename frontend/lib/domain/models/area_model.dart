@@ -1,8 +1,7 @@
 import 'package:mapbox_gl/mapbox_gl.dart';
 
-class AreaModel {
-  AreaModel({required this.geometry, required this.cadnum});
+abstract class AreaModel {
+  AreaModel({required this.geometry});
 
-  final List<LatLng> geometry;
-  final String cadnum;
+  final List<List<LatLng>> geometry;
 }

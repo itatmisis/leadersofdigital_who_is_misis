@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/domain/models/area_model.dart';
+import 'package:frontend/domain/models/land_model.dart';
 import 'package:frontend/presentation/screens/main_screen/bloc/polygon_loader_cubit.dart';
 import 'package:frontend/presentation/screens/main_screen/bloc/sidebar_cubit.dart';
 import 'package:frontend/presentation/screens/main_screen/map/plus_minus.dart';
@@ -74,7 +75,7 @@ class _MapWidgetState extends State<MapWidget> {
     Map<int, FillOptions> mapPolygons = {};
 
     for (var e in event.entries) {
-      mapPolygons[e.key] = FillOptions(geometry: [e.value.geometry], fillColor: '#D4BDDB', fillOutlineColor: '#8B559B', fillOpacity: 0.3);
+      mapPolygons[e.key] = FillOptions(geometry: [e.value.geometry[0]], fillColor: '#D4BDDB', fillOutlineColor: '#8B559B', fillOpacity: 0.3);
     }
 
     controller!.addFills(mapPolygons.values.toList());
@@ -92,7 +93,7 @@ class _MapWidgetState extends State<MapWidget> {
     }
     lastPressedPoly = argument;
 
-    context.read<SidebarCubit>().setCurrentArea(AreaModel(geometry: [], cadnum: 'dsdsdsd'));
+    context.read<SidebarCubit>().setCurrentArea(LandModel(geometry: [[]]));
     controller!.updateFill(argument, const FillOptions(fillColor: '#8B559B', fillOpacity: 0.5));
   }
 
