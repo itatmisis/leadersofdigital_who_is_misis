@@ -1,19 +1,11 @@
-import shapefile
-from sqlalchemy import Column, Integer, String, Enum, DECIMAL
-from sqlalchemy.dialects.postgresql import ARRAY
-from geoalchemy2 import Geometry
-
+from sqlalchemy import Column, String
 
 from backend import db
+from backend.data.models.base_polygonal_model import BasePolygonalModel
 
 
-class CulturalHeritage(db.Model):
-    __tablename__ = "cultural_heritage"  # СЗЗ (Санитарно-защитная зона)
-
-    oid = Column(Integer, primary_key=True)
-    parts = Column(ARRAY(Integer))
-    points = Column(Geometry(geometry_type="MULTIPOINT"))
-    bbox = Column(Geometry(geometry_type="POLYGON"))
+class CulturalHeritage(db.Model, BasePolygonalModel):
+    __tablename__ = "cultural_heritage"
 
     name = Column(String(127))
     number = Column(String(80))  # all entries from dataset were 'None'

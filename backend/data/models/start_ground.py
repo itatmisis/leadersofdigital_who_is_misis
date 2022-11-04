@@ -1,18 +1,11 @@
-from sqlalchemy import Column, Integer, String
-from sqlalchemy.dialects.postgresql import ARRAY
-from geoalchemy2.types import Geometry
+from sqlalchemy import Column, String
 
 from backend import db
+from backend.data.models.base_polygonal_model import BasePolygonalModel
 
 
-class StartGround(db.Model):
+class StartGround(db.Model, BasePolygonalModel):
     __tablename__ = "start_grounds"
-
-    oid = Column(Integer, primary_key=True)
-
-    parts = Column(ARRAY(Integer))
-    points = Column(Geometry(geometry_type="MULTIPOINT"))
-    bbox = Column(Geometry(geometry_type="POLYGON"))
 
     district = Column(String(20))
     address = Column(String(255), index=True)

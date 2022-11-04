@@ -1,18 +1,11 @@
-import shapefile
-from sqlalchemy import Column, Integer, String, Enum, DECIMAL
-from sqlalchemy.dialects.postgresql import ARRAY
-from geoalchemy2 import Geometry
+from sqlalchemy import Column, String, DECIMAL
 
 from backend import db
+from backend.data.models.base_polygonal_model import BasePolygonalModel
 
 
-class CapitalConstructionWorks(db.Model):
+class CapitalConstructionWorks(db.Model, BasePolygonalModel):
     __tablename__ = "capital_construction_works"  # ОКС (объект капитального строительства)
-
-    oid = Column(Integer, primary_key=True)
-    parts = Column(ARRAY(Integer))
-    points = Column(Geometry(geometry_type="MULTIPOINT"))
-    bbox = Column(Geometry(geometry_type="POLYGON"))
 
     cadnum = Column(String(80), index=True)
     address = Column(String(255), index=True)

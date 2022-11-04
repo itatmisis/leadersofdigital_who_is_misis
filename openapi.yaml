@@ -1,0 +1,78 @@
+openapi: 3.0.3
+info:
+  title: API
+  description: |-
+    Бэкенд приложения для хакатона "Лидеры цифровой трансформации 2022"
+  version: 1.0.0
+externalDocs:
+  description: Исходный код
+  url: https://github.com/itatmisis/leadersofdigital_who_is_misis
+servers:
+  - url: http://89.108.102.188:5000/api
+tags:
+  - name: lands
+    description: Земельные участки (ЗУ)
+paths:
+  /lands/get/polygons:
+    post:
+      tags:
+        - lands
+      summary: Границы земельных участков
+      description: Получить границы участков, входящих в заданную область
+      operationId: landsGetPolygons
+      requestBody:
+        description: Update an existent pet in the store
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                bbox:
+                  $ref: "#/components/schemas/Bbox"
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    oid:
+                      type: integer
+                    polygons:
+                      type: array
+                      items:
+                        $ref: "#/components/schemas/Polygon"
+
+        '400':
+          description: Invalid bbox
+
+components:
+  schemas:
+    Bbox:
+      type: object
+      properties:
+        bottom_left:
+          $ref: "#/components/schemas/Point"
+        top_right:
+          $ref: "#/components/schemas/Point"
+
+    Polygon:
+      type: array
+      items:
+        $ref: "#/components/schemas/Point"
+
+    Point:
+      type: object
+      properties:
+          lat:
+            type: number
+            format: double
+            example: 55.751244
+          lon:
+            type: number
+            format: double
+            example: 37.618423

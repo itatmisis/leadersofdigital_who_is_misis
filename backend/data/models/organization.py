@@ -1,14 +1,12 @@
-from sqlalchemy import Column, Integer, String, Enum, DECIMAL
-from sqlalchemy.dialects.postgresql import ARRAY
 from geoalchemy2.types import Geometry
+from sqlalchemy import Column, Integer, String
 
 from backend import db
+from backend.data.models.base_shp_model import BaseSHPModel
 
 
-class Organization(db.Model):
+class Organization(db.Model, BaseSHPModel):
     __tablename__ = "organizations"
-
-    oid = Column(Integer, primary_key=True)
 
     point = Column(Geometry(geometry_type="POINT"))
 
