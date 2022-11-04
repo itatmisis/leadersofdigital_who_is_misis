@@ -26,7 +26,7 @@ class PolygonLoaderCubit extends Cubit<Map<int, AreaModel>?> {
       for (var g in p['polygons'][0]) {
         geometry.add(LatLng(g[0], g[1]));
       }
-      data[p['oid']] = LandModel(geometry: geometry);
+      data[p['oid']] = LandModel(geometry: [geometry]);
     }
 
     return data;

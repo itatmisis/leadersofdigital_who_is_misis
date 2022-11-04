@@ -75,7 +75,7 @@ class _MapWidgetState extends State<MapWidget> {
     Map<int, FillOptions> mapPolygons = {};
 
     for (var e in event.entries) {
-      mapPolygons[e.key] = FillOptions(geometry: [e.value.geometry], fillColor: '#D4BDDB', fillOutlineColor: '#8B559B', fillOpacity: 0.3);
+      mapPolygons[e.key] = FillOptions(geometry: [e.value.geometry[0]], fillColor: '#D4BDDB', fillOutlineColor: '#8B559B', fillOpacity: 0.3);
     }
 
     controller!.addFills(mapPolygons.values.toList());
@@ -93,7 +93,7 @@ class _MapWidgetState extends State<MapWidget> {
     }
     lastPressedPoly = argument;
 
-    context.read<SidebarCubit>().setCurrentArea(LandModel(geometry: []));
+    context.read<SidebarCubit>().setCurrentArea(LandModel(geometry: [[]]));
     controller!.updateFill(argument, const FillOptions(fillColor: '#8B559B', fillOpacity: 0.5));
   }
 
