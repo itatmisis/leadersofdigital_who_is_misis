@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/data/api/api.dart';
+import 'package:frontend/domain/models/area_model.dart';
+import 'package:frontend/presentation/screens/main_screen/bloc/polygon_loader_cubit.dart';
+import 'package:frontend/presentation/screens/main_screen/bloc/sidebar_cubit.dart';
 import 'package:frontend/presentation/screens/main_screen/map/plus_minus.dart';
-import 'package:frontend/presentation/screens/main_screen/sidebar/side_bar.dart';
 import 'package:frontend/presentation/theme/app_colors.dart';
 import 'package:frontend/presentation/widgets/small_button.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
@@ -15,42 +18,46 @@ class MapWidget extends StatefulWidget {
 }
 
 class _MapWidgetState extends State<MapWidget> {
-  late MapboxMapController controller;
+  MapboxMapController? controller;
 
   bool onDrawed = false;
+  
+  @override
+  void initState() {
+    super.initState();
+    context.read<PolygonLoaderCubit>().stream.listen((Map<int, AreaModel>? event) {;
+      if (controller != null && event != null) {
+        controller!.clearFills();
 
-  void onCameraZoomPlus() {
-    controller.animateCamera(
-        CameraUpdate.zoomTo(controller.cameraPosition!.zoom + 1));
-  }
+        Map<int, FillOptions> mapPolygons = {};
 
-  void onCameraZoomMinus() {
-    controller.animateCamera(
-        CameraUpdate.zoomTo(controller.cameraPosition!.zoom - 1));
-  }
+        for (var e in event.entries) {
+          mapPolygons[e.key] = FillOptions(geometry: [e.value.geometry], fillColor: '#D4BDDB', fillOutlineColor: '#8B559B', fillOpacity: 0.3);
+        }
 
-  void drawPolygonsFromServer() async {
-    final polygons = await Api().getPolygons();
-
-    Map<int, FillOptions> mapPolygons = {};
-
-    //late LatLng l;
-    for (var p in polygons) {
-      List<LatLng> geometry = [];
-      for (var g in p['polygons'][0]) {
-        //l = LatLng(g[0], g[1]);
-        geometry.add(LatLng(g[0], g[1]));
+        controller!.addFills(mapPolygons.values.toList());
+        controller!.onFillTapped.add((argument) {
+          context.read<SidebarCubit>().setCurrentArea(AreaModel(geometry: [], cadnum: 'dsdsdsd'));
+        });
       }
-      mapPolygons[p['oid']] = FillOptions(geometry: [geometry], fillColor: '#8B559B', fillOutlineColor: '#8B559B', fillOpacity: 0.7);
-    }
-    //controller.moveCamera(CameraUpdate.newCameraPosition(CameraPosition(target: l, zoom: 15)));
-    controller.addFills(mapPolygons.values.toList());
+
+    });
   }
 
   @override
   void dispose() {
-    controller.dispose();
+    controller!.dispose();
     super.dispose();
+  }
+
+  void onCameraZoomPlus() {
+    controller!.animateCamera(
+        CameraUpdate.zoomTo(controller!.cameraPosition!.zoom + 1));
+  }
+
+  void onCameraZoomMinus() {
+    controller!.animateCamera(
+        CameraUpdate.zoomTo(controller!.cameraPosition!.zoom - 1));
   }
 
   @override
@@ -73,10 +80,6 @@ class _MapWidgetState extends State<MapWidget> {
           ),
           onMapCreated: (MapboxMapController c) {
             controller = c;
-          },
-
-          onStyleLoadedCallback: () {
-            drawPolygonsFromServer();
           },
         ),
         Align(

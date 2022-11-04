@@ -1,5 +1,3 @@
-import 'dart:html';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/presentation/screens/main_screen/sidebar/widgets/document.dart';
@@ -27,7 +25,6 @@ class SideBar extends StatelessWidget {
 
     return Container(
       color: AppColors.white,
-      height: double.infinity,
       width: 450,
       child: SingleChildScrollView(
         child: Padding(
