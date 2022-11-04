@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:frontend/presentation/screens/main_screen/bloc/sidebar_cubit.dart';
 import 'package:frontend/presentation/screens/main_screen/sidebar/widgets/document.dart';
 import 'package:frontend/presentation/screens/main_screen/sidebar/widgets/information_widget.dart';
 import 'package:frontend/presentation/screens/main_screen/sidebar/widgets/purple_container_widget.dart';
@@ -16,11 +18,15 @@ class SideBar extends StatelessWidget {
       Criterion("Тип", "Объект недвижимости"),
       Criterion("Вид", "Земельный участок"),
       Criterion("Кадастровый квартал", "77:01:0002009"),
-      Criterion("Адрес", "адресные ориентиры: Большой Толмачевский, вл 3, стр 1, 2, 5, 6"),
+      Criterion("Адрес",
+          "адресные ориентиры: Большой Толмачевский, вл 3, стр 1, 2, 5, 6"),
       Criterion("Статус", "Ранее учтенный"),
-      Criterion("Категория земель","Земли населенных пунктов"),
-      Criterion("Разрешенное использование","эксплуатации библиотеки",),
-      Criterion("Дата внесения сведений","11.01.2022"),
+      Criterion("Категория земель", "Земли населенных пунктов"),
+      Criterion(
+        "Разрешенное использование",
+        "эксплуатации библиотеки",
+      ),
+      Criterion("Дата внесения сведений", "11.01.2022"),
     ];
 
     return Container(
@@ -33,8 +39,17 @@ class SideBar extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(
-                height: 40,
+              Align(
+                alignment: Alignment.topRight,
+                child: IconButton(
+                  onPressed: () {
+                    context.read<SidebarCubit>().disableArea();
+                  },
+                  icon: const Icon(
+                    Icons.close,
+                    color: AppColors.black,
+                  ),
+                ),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -45,11 +60,14 @@ class SideBar extends StatelessWidget {
                     children: [
                       Text("77:01:0002009:29", style: AppFonts.heading1),
                       Text("Земельный участок",
-                          style:
-                          AppFonts.subtitle1.copyWith(color: AppColors.gray)),
+                          style: AppFonts.subtitle1
+                              .copyWith(color: AppColors.gray)),
                     ],
                   ),
-                  const Icon(Icons.bookmark_border_rounded, color: AppColors.black,),
+                  const Icon(
+                    Icons.bookmark_border_rounded,
+                    color: AppColors.black,
+                  ),
                 ],
               ),
               const SizedBox(
@@ -88,8 +106,8 @@ class SideBar extends StatelessWidget {
               ),
             ],
           ),
-        )
-      )
+        ),
+      ),
     );
   }
 }
