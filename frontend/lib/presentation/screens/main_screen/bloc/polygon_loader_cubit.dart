@@ -41,7 +41,8 @@ class PolygonLoaderCubit extends Cubit<Map<int, AreaModel>?> {
       emit(await _loadFromStorage());
     } else if (downloaded == DownloadedState.none) {
       downloaded = DownloadedState.inProgress;
-      emit(await _download());
+      Storage().polygons = await _download();
+      emit(Storage().polygons);
       downloaded = DownloadedState.downloaded;
     }
   }
