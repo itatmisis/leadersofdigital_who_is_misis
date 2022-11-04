@@ -8,4 +8,5 @@ class SidebarCubit extends Cubit<AreaModel?> {
     emit(areaModel);
   }
 
+
 }
