@@ -1,10 +1,12 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:frontend/data/api/api.dart';
 import 'package:frontend/domain/models/area_model.dart';
 import 'package:frontend/presentation/screens/main_screen/bloc/polygon_loader_cubit.dart';
 import 'package:frontend/presentation/screens/main_screen/bloc/sidebar_cubit.dart';
 import 'package:frontend/presentation/screens/main_screen/map/plus_minus.dart';
+import 'package:frontend/presentation/screens/main_screen/widgets/short_menu.dart';
 import 'package:frontend/presentation/theme/app_colors.dart';
 import 'package:frontend/presentation/widgets/small_button.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
@@ -21,26 +23,32 @@ class _MapWidgetState extends State<MapWidget> {
   MapboxMapController? controller;
 
   bool onDrawed = false;
+
+  OverlayEntry? shortMenu;
+  bool isShortMenuActive = false;
+
+  Fill? lastPressedPoly;
   
   @override
   void initState() {
     super.initState();
-    context.read<PolygonLoaderCubit>().stream.listen((Map<int, AreaModel>? event) {;
-      if (controller != null && event != null) {
-        controller!.clearFills();
-
-        Map<int, FillOptions> mapPolygons = {};
-
-        for (var e in event.entries) {
-          mapPolygons[e.key] = FillOptions(geometry: [e.value.geometry], fillColor: '#D4BDDB', fillOutlineColor: '#8B559B', fillOpacity: 0.3);
+    context.read<PolygonLoaderCubit>().stream.listen((Map<int, AreaModel>? event) {
+      if (controller != null) {
+        if (event != null) {
+          drawFills(event);
         }
-
-        controller!.addFills(mapPolygons.values.toList());
-        controller!.onFillTapped.add((argument) {
-          context.read<SidebarCubit>().setCurrentArea(AreaModel(geometry: [], cadnum: 'dsdsdsd'));
-        });
       }
+    });
 
+    context.read<SidebarCubit>().stream.listen((AreaModel? event) {
+      if (controller != null && event == null) {
+        if (lastPressedPoly != null){
+          controller!.updateFill(lastPressedPoly!,
+              const FillOptions(fillColor: '#D4BDDB', fillOpacity: 0.3));
+
+          lastPressedPoly = null;
+        }
+      }
     });
   }
 
@@ -59,6 +67,59 @@ class _MapWidgetState extends State<MapWidget> {
     controller!.animateCamera(
         CameraUpdate.zoomTo(controller!.cameraPosition!.zoom - 1));
   }
+
+  void drawFills(Map<int, AreaModel> event) {
+    controller!.clearFills();
+
+    Map<int, FillOptions> mapPolygons = {};
+
+    for (var e in event.entries) {
+      mapPolygons[e.key] = FillOptions(geometry: [e.value.geometry], fillColor: '#D4BDDB', fillOutlineColor: '#8B559B', fillOpacity: 0.3);
+    }
+
+    controller!.addFills(mapPolygons.values.toList());
+    controller!.onFillTapped.add(onPolyPressed);
+    controller!.onFeatureTapped.add((id, point, coordinates) {
+      _hideShortMenu();
+      _showShortMenu(point);
+    });
+  }
+
+  void onPolyPressed(Fill argument) {
+    if (lastPressedPoly != null) {
+      controller!.updateFill(lastPressedPoly!,
+          const FillOptions(fillColor: '#D4BDDB', fillOpacity: 0.3));
+    }
+    lastPressedPoly = argument;
+
+    context.read<SidebarCubit>().setCurrentArea(AreaModel(geometry: [], cadnum: 'dsdsdsd'));
+    controller!.updateFill(argument, const FillOptions(fillColor: '#8B559B', fillOpacity: 0.5));
+  }
+
+  void _showShortMenu(Point<double> click) {
+    isShortMenuActive = true;
+
+    OverlayState? overlayState = Overlay.of(context);
+    shortMenu = OverlayEntry(
+        builder: (_) => Positioned(
+          top: click.y,
+          left: click.x,
+          child: PointerInterceptor(
+            child: ShortMenu(),
+          )
+        )
+    );
+
+    overlayState.insert(shortMenu!);
+  }
+
+  void _hideShortMenu() {
+    if (isShortMenuActive) {
+      isShortMenuActive = false;
+      shortMenu?.remove();
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -80,6 +141,10 @@ class _MapWidgetState extends State<MapWidget> {
           ),
           onMapCreated: (MapboxMapController c) {
             controller = c;
+          },
+          onMapClick: (p, l) {
+            _hideShortMenu();
+            context.read<SidebarCubit>().setCurrentArea(null);
           },
         ),
         Align(
