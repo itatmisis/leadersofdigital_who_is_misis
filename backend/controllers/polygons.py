@@ -6,8 +6,20 @@ from backend import services
 from backend.services import polygons, lands
 
 
+@app.route("/api/<string:entity>/polygons")
+def get_polygons_controller(entity):
+    try:
+        objects = services.polygons.get_all_polygons(entity)
+    except ValueError:
+        return flask.abort(404)
+
+    response = dict()
+    response[entity] = services.polygons.serialize_polygons(objects)
+    return flask.jsonify(response)
+
+
 @app.route("/api/lands/get_polygons", methods=["POST"])  # type: ignore
-def get_polygons_controller():
+def get_polygons_by_bbox_controller():
     json = flask.request.json
     bbox = json["bbox"]
     try:

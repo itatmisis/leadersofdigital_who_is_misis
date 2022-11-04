@@ -9,19 +9,28 @@ externalDocs:
   url: https://github.com/itatmisis/leadersofdigital_who_is_misis
 servers:
   - url: http://89.108.102.188:5000/api
+  - url: http://localhost:8000/api
 tags:
   - name: lands
     description: Земельные участки (ЗУ)
+  - name: capital_construction_works
+    description: Объекты капитального строительства (ОКС)
+  - name: cultural_heritage
+    description: Объекты культурного наследия
+  - name: sanitary_protected_zones
+    description: Сантиарно-защитные зоны
+  - name: start_grounds
+    description: Стартовые площадки
 paths:
-  /lands/get/polygons:
+  /lands:
     post:
       tags:
         - lands
       summary: Границы земельных участков
       description: Получить границы участков, входящих в заданную область
-      operationId: landsGetPolygons
+      operationId: landsGetByBbox
       requestBody:
-        description: Update an existent pet in the store
+        description: Bbox (Boundary box) - запрашивеамая область
         content:
           application/json:
             schema:
@@ -49,6 +58,139 @@ paths:
 
         '400':
           description: Invalid bbox
+  /lands/polygons:
+    get:
+      tags:
+        - lands
+      summary: Границы ЗУ
+      description: Границы всех земельных участков
+      operationId: landsGetPolygons
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  lands:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        oid:
+                          type: integer
+                        polygons:
+                          type: array
+                          items:
+                            $ref: "#/components/schemas/Polygon"
+  /capital_construction_works/polygons:
+    get:
+      tags:
+        - capital_construction_works
+      summary: Границы ОКС
+      description: Границы всех объектов капитального строительства
+      operationId: capital_construction_worksGetPolygon
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  capital_construction_works:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        oid:
+                          type: integer
+                        polygons:
+                          type: array
+                          items:
+                            $ref: "#/components/schemas/Polygon"
+  /cultural_heritage/polygons:
+    get:
+      tags:
+        - cultural_heritage
+      summary: Границы объектов культурного наследия
+      description: Границы всех объектов культурного наследия
+      operationId: cultural_heritageGetPolygon
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cultural_heritage:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        oid:
+                          type: integer
+                        polygons:
+                          type: array
+                          items:
+                            $ref: "#/components/schemas/Polygon"
+  /sanitary_protected_zones/polygons:
+    get:
+      tags:
+        - sanitary_protected_zones
+      summary: Границы санитарно-защитных зон
+      description: Границы всех санитарно-защитных зон
+      operationId: sanitary_protected_zonesGetPolygon
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sanitary_protected_zones:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        oid:
+                          type: integer
+                        polygons:
+                          type: array
+                          items:
+                            $ref: "#/components/schemas/Polygon"
+  /start_grounds/polygons:
+    get:
+      tags:
+        - start_grounds
+      summary: Границы стартовых площадок
+      description: Границы всех стартовых площадок
+      operationId: start_groundsGetPolygon
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  start_grounds:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        oid:
+                          type: integer
+                        polygons:
+                          type: array
+                          items:
+                            $ref: "#/components/schemas/Polygon"
+
+
+      
 
 components:
   schemas:

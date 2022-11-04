@@ -1,6 +1,17 @@
+from backend import db
 from backend.data.models.base_polygonal_model import BasePolygonalModel
 import shapely.geometry
 import geoalchemy2.shape
+
+from backend.services import entities
+
+
+def get_all_polygons(entity: str) -> list[BasePolygonalModel]:
+    if not entities.PolygonalEntityManager.is_valid(entity):
+        raise ValueError(f"Entity {entity} doesn't exist")
+
+    objects = db.session.query(entities.PolygonalEntityManager.get_model(entity)).all()
+    return objects
 
 
 def serialize_polygons(objects: list[BasePolygonalModel]):
