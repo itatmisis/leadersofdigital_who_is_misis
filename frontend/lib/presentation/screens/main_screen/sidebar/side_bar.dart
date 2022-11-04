@@ -43,7 +43,7 @@ class SideBar extends StatelessWidget {
                 alignment: Alignment.topRight,
                 child: IconButton(
                   onPressed: () {
-                    context.read<SidebarCubit>().disableArea();
+                    context.read<SidebarCubit>().setCurrentArea(null);
                   },
                   icon: const Icon(
                     Icons.close,
