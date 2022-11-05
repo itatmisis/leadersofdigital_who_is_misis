@@ -13,6 +13,6 @@ class SanitaryModel extends AreaModel implements InformationModel{
   }
   SanitaryModel.fromJson(Map<String, dynamic> json)
       : oid = json['oid'],
-        super(json['polygons']);
+        super.fromJson(json['polygons']);
 
 }

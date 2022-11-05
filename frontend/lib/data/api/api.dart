@@ -26,31 +26,61 @@ class Api {
     _client = dio;
   }
 
-  Future<LandModel> getLands() async {
+  Future<Map<int, LandModel>> getLands() async {
     List<LandModel> res=[];
     final response = await _client.get(ApiRoutes.getLands);
-    final json = jsonDecode(response.data);
-    return LandModel.fromJson(json);
+
+    Map<int, LandModel> m = {};
+
+    for (var j in response.data['lands']) {
+      m[j['oid']] = LandModel.fromJson(j);
+    }
+
+    return m;
   }
-  Future<CapitalModel> getCapital() async {
+  Future<Map<int, CapitalModel>> getCapital() async {
     final response = await _client.get(ApiRoutes.getCapital);
-    final json = jsonDecode(response.data);
-    return CapitalModel.fromJson(json);
+
+    Map<int, CapitalModel> m = {};
+
+    for (var j in response.data['capital_construction_works']) {
+      m[j['oid']] = CapitalModel.fromJson(j);
+    }
+
+    return m;
   }
-  Future<SanitaryModel> getSanitary() async {
+  Future<Map<int, SanitaryModel>> getSanitary() async {
     final response = await _client.get(ApiRoutes.getSanitary);
-    final json = jsonDecode(response.data);
-    return SanitaryModel.fromJson(json);
+
+    Map<int, SanitaryModel> m = {};
+
+    for (var j in response.data['sanitary_protected_zones']) {
+      m[j['oid']] = SanitaryModel.fromJson(j);
+    }
+
+    return m;
   }
-  Future<StartModel> getStartGrounds() async {
+  Future<Map<int, StartModel>> getStartGrounds() async {
     final response = await _client.get(ApiRoutes.getStartGrounds);
-    final json = jsonDecode(response.data);
-    return StartModel.fromJson(json);
+
+    Map<int, StartModel> m = {};
+
+    for (var j in response.data['start_grounds']) {
+      m[j['oid']] = StartModel.fromJson(j);
+    }
+
+    return m;
   }
-  Future<CulturalHeritageModel> getCulturalHeritage() async {
+  Future<Map<int, CulturalHeritageModel>> getCulturalHeritage() async {
     final response = await _client.get(ApiRoutes.getCulturalHeritage);
-    final json = jsonDecode(response.data);
-    return CulturalHeritageModel.fromJson(json);
+
+    Map<int, CulturalHeritageModel> m = {};
+
+    for (var j in response.data['cultural_heritage']) {
+      m[j['oid']] = CulturalHeritageModel.fromJson(j);
+    }
+
+    return m;
   }
 
 

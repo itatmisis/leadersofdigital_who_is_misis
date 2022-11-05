@@ -28,7 +28,12 @@ class PolygonLoaderCubit extends Cubit<DownloadedState> {
     } else if (downloaded == DownloadedState.none) {
       downloaded = DownloadedState.inProgress;
       emit(downloaded);
-      //Storage().lands = await _download();
+
+      Storage().lands = await Api().getLands();
+      Storage().capitals = await Api().getCapital();
+      Storage().sanitaries = await Api().getSanitary();
+      Storage().starts = await Api().getStartGrounds();
+
       downloaded = DownloadedState.downloaded;
       emit(downloaded);
     }

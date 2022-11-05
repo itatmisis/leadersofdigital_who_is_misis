@@ -13,6 +13,6 @@ class CulturalHeritageModel extends AreaModel implements InformationModel{
   }
   CulturalHeritageModel.fromJson(Map<String, dynamic> json)
       : oid = json['oid'],
-        super(json['polygons']);
+        super.fromJson(json['polygons']);
 
 }

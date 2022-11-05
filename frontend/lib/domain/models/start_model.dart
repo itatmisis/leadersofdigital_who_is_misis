@@ -13,6 +13,6 @@ class StartModel extends AreaModel implements InformationModel{
   }
   StartModel.fromJson(Map<String, dynamic> json)
       : oid = json['oid'],
-        super(json['polygons']);
+        super.fromJson(json['polygons']);
 
 }

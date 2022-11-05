@@ -36,7 +36,7 @@ class _MapWidgetState extends State<MapWidget> {
     super.initState();
     context.read<PolygonLoaderCubit>().stream.listen((event) {
       if (controller != null) {
-        if (event != DownloadedState.downloaded) {
+        if (event == DownloadedState.downloaded) {
           drawFills(Storage().lands);
           drawFills(Storage().capitals);
           drawFills(Storage().sanitaries);
@@ -74,8 +74,6 @@ class _MapWidgetState extends State<MapWidget> {
   }
 
   void drawFills(Map<int, AreaModel> event) {
-    controller!.clearFills();
-
     Map<int, FillOptions> mapPolygons = {};
 
     for (var e in event.entries) {

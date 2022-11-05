@@ -4,9 +4,9 @@ import 'package:mapbox_gl/mapbox_gl.dart';
 abstract class AreaModel extends GeographicModel {
   AreaModel(this.geometry);
 
-  late List<List<LatLng>> geometry;
+  List<List<LatLng>> geometry = [];
 
-  AreaModel.fromJson(List<List<Map<String, double>>> json) {
+  AreaModel.fromJson(List json) {
     for (int i = 0; i < json.length; i++) {
       List<LatLng> polygons = [];
       for (int j = 0; j < json[i].length; j++) {

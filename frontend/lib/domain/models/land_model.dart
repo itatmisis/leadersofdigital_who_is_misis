@@ -13,5 +13,5 @@ class LandModel extends AreaModel implements InformationModel{
   }
   LandModel.fromJson(Map<String, dynamic> json)
       : oid = json['oid'],
-        super(json['polygons']);
+        super.fromJson(json['polygons']);
 }
