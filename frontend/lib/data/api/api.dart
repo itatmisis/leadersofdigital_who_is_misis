@@ -27,6 +27,7 @@ class Api {
   }
 
   Future<LandModel> getLands() async {
+    List<LandModel> res=[];
     final response = await _client.get(ApiRoutes.getLands);
     final json = jsonDecode(response.data);
     return LandModel.fromJson(json);

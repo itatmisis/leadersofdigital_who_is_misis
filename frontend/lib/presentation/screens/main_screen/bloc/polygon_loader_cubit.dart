@@ -29,8 +29,8 @@ class PolygonLoaderCubit extends Cubit<DownloadedState> {
       downloaded = DownloadedState.inProgress;
       emit(downloaded);
       //Storage().lands = await _download();
-      emit(downloaded);
       downloaded = DownloadedState.downloaded;
+      emit(downloaded);
     }
   }
 }

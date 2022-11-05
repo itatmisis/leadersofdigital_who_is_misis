@@ -30,7 +30,7 @@ class _MapWidgetState extends State<MapWidget> {
   bool isShortMenuActive = false;
 
   Fill? lastPressedPoly;
-  
+
   @override
   void initState() {
     super.initState();
@@ -97,7 +97,7 @@ class _MapWidgetState extends State<MapWidget> {
     }
     lastPressedPoly = argument;
 
-    context.read<SidebarCubit>().setCurrentArea(LandModel(geometry: [[]]));
+    context.read<SidebarCubit>().setCurrentArea(LandModel(123,[[]]));
     controller!.updateFill(argument, const FillOptions(fillColor: '#8B559B', fillOpacity: 0.5));
   }
 
@@ -107,15 +107,15 @@ class _MapWidgetState extends State<MapWidget> {
     OverlayState? overlayState = Overlay.of(context);
     shortMenu = OverlayEntry(
         builder: (_) => Positioned(
-          top: click.y,
-          left: click.x,
-          child: PointerInterceptor(
-            child: ShortMenu(),
-          )
+            top: click.y,
+            left: click.x,
+            child: PointerInterceptor(
+              child: ShortMenu(),
+            )
         )
     );
 
-    overlayState.insert(shortMenu!);
+    overlayState?.insert(shortMenu!);
   }
 
   void _hideShortMenu() {
@@ -137,9 +137,9 @@ class _MapWidgetState extends State<MapWidget> {
           )),
           compassEnabled: false,
           accessToken:
-              'pk.eyJ1IjoicGl0dXNhbm9uaW1vdXMiLCJhIjoiY2twcHk5M2VtMDZvZjJ2bzEzMHNhNDM1diJ9.8BLcJknh8FvUVLJRZbHJDQ',
+          'pk.eyJ1IjoicGl0dXNhbm9uaW1vdXMiLCJhIjoiY2twcHk5M2VtMDZvZjJ2bzEzMHNhNDM1diJ9.8BLcJknh8FvUVLJRZbHJDQ',
           styleString:
-              'mapbox://styles/pitusanonimous/ckpq0eydh0tk318mr0dcw773k',
+          'mapbox://styles/pitusanonimous/ckpq0eydh0tk318mr0dcw773k',
           initialCameraPosition: const CameraPosition(
             zoom: 12.0,
             target: LatLng(55.75110596550744, 37.609532416801954),
