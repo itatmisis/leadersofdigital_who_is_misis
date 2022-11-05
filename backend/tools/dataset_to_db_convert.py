@@ -6,7 +6,7 @@ import shapefile
 from alive_progress import alive_bar
 from shapely import geometry, wkt
 
-from backend import db
+from backend import db, app
 from backend.data.models import *
 from backend.data.models.start_ground import StartGround
 from backend.tools import coord_convert
@@ -58,6 +58,9 @@ def main(path_to_dataset, progress_output_stream=None):
     progress_log_wrapper(load_buildings, path_to_dataset, _caption="Здания СВАО_САО жилое_нежилое")
 
     db.session.commit()
+
+    for file in os.listdir(app.config["PREPROCESSED_DATA_PATH"]):
+        os.remove(os.path.join(app.config["PREPROCESSED_DATA_PATH"], file))
 
 
 def convert_bbox(x1, y1, x2, y2):

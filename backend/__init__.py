@@ -18,6 +18,8 @@ if os.environ.get("DEBUG") == "true":
 
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DB_URL")
 app.config["PREPROCESSED_DATA_PATH"] = "backend/data/preprocessed"
+if not os.path.exists(app.config["PREPROCESSED_DATA_PATH"]):
+    os.mkdir(app.config["PREPROCESSED_DATA_PATH"])
 
 db = SQLAlchemy(app)
 
