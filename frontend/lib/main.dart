@@ -4,6 +4,7 @@ import 'package:frontend/presentation/screens/main_screen/bloc/layers_cubit.dart
 import 'package:frontend/presentation/screens/main_screen/bloc/polygon_loader_cubit.dart';
 import 'package:frontend/presentation/screens/main_screen/bloc/sidebar_cubit.dart';
 import 'package:frontend/presentation/screens/main_screen/main_screen.dart';
+import 'package:frontend/presentation/theme/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 void main() {

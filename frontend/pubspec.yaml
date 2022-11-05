@@ -14,10 +14,11 @@ dependencies:
   flutter:
     sdk: flutter
 
-
   json_annotation: ^4.7.0
   cupertino_icons: ^1.0.2
-  mapbox_gl: ^0.16.0
+  mapbox_gl:
+    git: https://github.com/flutter-mapbox-gl/maps.git
+
   flutter_svg: ^1.1.6
   pointer_interceptor: ^0.9.3+3
   google_fonts: any

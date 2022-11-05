@@ -4,7 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/data/storage/storage.dart';
 import 'package:frontend/domain/models/area_model.dart';
+import 'package:frontend/domain/models/capital_model.dart';
 import 'package:frontend/domain/models/land_model.dart';
+import 'package:frontend/domain/models/sanitary_model.dart';
+import 'package:frontend/domain/models/start_model.dart';
 import 'package:frontend/presentation/screens/main_screen/bloc/layers_cubit.dart';
 import 'package:frontend/presentation/screens/main_screen/bloc/polygon_loader_cubit.dart';
 import 'package:frontend/presentation/screens/main_screen/bloc/sidebar_cubit.dart';
@@ -14,6 +17,33 @@ import 'package:frontend/presentation/theme/app_colors.dart';
 import 'package:frontend/presentation/widgets/small_button.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
+
+extension Hasher on FillOptions {
+
+}
+
+class FillOptionContainer {
+  final FillOptions fillOptions;
+  const FillOptionContainer(this.fillOptions);
+
+  @override
+  bool operator==(Object o) {
+    if (o is FillOptions && o.fillColor == fillOptions.fillColor) {
+      return true;
+    }
+
+    if (o is FillOptionContainer && o.fillOptions.fillColor == fillOptions.fillColor) {
+      return true;
+    }
+
+    return false;
+  }
+
+  @override
+  // TODO: implement hashCode
+  int get hashCode => fillOptions.fillColor.hashCode + fillOptions.geometry.hashCode;
+
+}
 
 class MapWidget extends StatefulWidget {
   MapWidget({super.key});
@@ -38,10 +68,10 @@ class _MapWidgetState extends State<MapWidget> {
     context.read<PolygonLoaderCubit>().stream.listen((event) {
       if (controller != null) {
         if (event == DownloadedState.downloaded) {
-          drawFills(Storage().lands);
-          drawFills(Storage().capitals);
-          drawFills(Storage().sanitaries);
-          drawFills(Storage().starts);
+          putLayerOnMap<LandModel>(Storage().lands, AppColors.dewberry400, AppColors.dewberry900, 0.3);
+          putLayerOnMap<CapitalModel>(Storage().capitals, AppColors.eggshellBlue400, AppColors.eggshellBlue900, 1);
+          putLayerOnMap<SanitaryModel>(Storage().sanitaries, AppColors.lightGray, AppColors.gray, 0.3);
+          putLayerOnMap<StartModel>(Storage().starts, AppColors.lightGray, AppColors.gray, 0.3);
         }
       }
     });
@@ -50,11 +80,12 @@ class _MapWidgetState extends State<MapWidget> {
       if (controller != null) {
         if (context.read<PolygonLoaderCubit>().downloaded == DownloadedState.downloaded) {
           controller!.clearFills();
+          controller!.onFillTapped.clear();
 
-          if (event[0]) drawFills(Storage().lands);
-          if (event[1]) drawFills(Storage().capitals);
-          if (event[3]) drawFills(Storage().sanitaries);
-          if (event[4]) drawFills(Storage().starts);
+          if (event[0]) putLayerOnMap<LandModel>(Storage().lands, AppColors.dewberry400, AppColors.dewberry900, 0.3);
+          if (event[3]) putLayerOnMap<CapitalModel>(Storage().capitals, AppColors.eggshellBlue400, AppColors.eggshellBlue900, 1);
+          if (event[4]) putLayerOnMap<SanitaryModel>(Storage().sanitaries, AppColors.lightGray, AppColors.gray, 0.3);
+          if (event[1]) putLayerOnMap<StartModel>(Storage().starts, AppColors.lightGray, AppColors.gray, 0.3);
         }
       }
     });
@@ -62,6 +93,7 @@ class _MapWidgetState extends State<MapWidget> {
     context.read<SidebarCubit>().stream.listen((AreaModel? event) {
       if (controller != null && event == null) {
         if (lastPressedPoly != null){
+
           controller!.updateFill(lastPressedPoly!,
               const FillOptions(fillColor: '#D4BDDB', fillOpacity: 0.3));
 
@@ -69,6 +101,8 @@ class _MapWidgetState extends State<MapWidget> {
         }
       }
     });
+
+
   }
 
   @override
@@ -87,19 +121,27 @@ class _MapWidgetState extends State<MapWidget> {
         CameraUpdate.zoomTo(controller!.cameraPosition!.zoom - 1));
   }
 
-  void drawFills(Map<int, AreaModel> event) {
-    Map<int, FillOptions> mapPolygons = {};
+  void putLayerOnMap<T>(Map<int, AreaModel> event, Color fillColor, Color outlineColor, [double? opacity]) async {
+    Map<FillOptionContainer, AreaModel> mapPolygons = {};
 
     for (var e in event.entries) {
-      mapPolygons[e.key] = FillOptions(geometry: [e.value.geometry[0]], fillColor: '#D4BDDB', fillOutlineColor: '#8B559B', fillOpacity: 0.3);
+      mapPolygons[FillOptionContainer(FillOptions(geometry: [e.value.geometry[0]], fillColor: fillColor.toHexTriplet(), fillOutlineColor: outlineColor.toHexTriplet(), fillOpacity: opacity ?? fillColor.opacity))] = e.value;
     }
 
-    controller!.addFills(mapPolygons.values.toList());
-    controller!.onFillTapped.add(onPolyPressed);
-    controller!.onFeatureTapped.add((id, point, coordinates) {
-      _hideShortMenu();
-      _showShortMenu(point);
+    List l = await drawFills(mapPolygons.keys.toList(), fillColor, outlineColor);
+
+    controller!.onFillTapped.add((argument) {
+      FillOptionContainer c = FillOptionContainer(argument.options);
+      if (mapPolygons.containsKey(c)) {
+        print(T.toString());
+      }
     });
+  }
+
+
+  Future<List<Fill>> drawFills(List<FillOptionContainer> fillOptions, Color fillColor, Color outlineColor, [double? opacity]) async {
+    final List<FillOptions> f = List.generate(fillOptions.length, (index) => fillOptions[index].fillOptions);
+    return await controller!.addFills(f);
   }
 
   void onPolyPressed(Fill argument) {
