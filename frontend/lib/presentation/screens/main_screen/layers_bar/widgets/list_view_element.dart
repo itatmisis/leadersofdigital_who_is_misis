@@ -1,11 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/presentation/theme/app_colors.dart';
-class ListViewElement extends StatelessWidget {
+import 'package:frontend/presentation/theme/app_fonts.dart';
 
+class ListViewElement extends StatelessWidget {
   bool isChecked;
   void Function(bool?)? onPressed;
+  Color? color;
 
-  ListViewElement({Key? key, required this.index, required this.layers, this.onPressed, required this.isChecked}) : super(key: key);
+  ListViewElement(
+      {Key? key,
+      required this.index,
+      required this.layers,
+      this.onPressed,
+      required this.isChecked,
+      this.color})
+      : super(key: key);
 
   final int index;
   final List<String> layers;
@@ -14,17 +23,23 @@ class ListViewElement extends StatelessWidget {
     return Row(
       children: [
         Checkbox(
-          activeColor: AppColors.veryPeri500,
-          value: isChecked,
-          onChanged: onPressed
+            activeColor: AppColors.veryPeri500,
+            value: isChecked,
+            onChanged: onPressed),
+        const SizedBox(
+          width: 16,
+        ),
+        Container(
+          width: 28,
+          height: 28,
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(4), color: color),
         ),
         const SizedBox(
           width: 16,
         ),
-        Text(layers[index]),
+        Flexible(child: Text(layers[index], style: AppFonts.body2Regular)),
       ],
     );
   }
-
 }
-
