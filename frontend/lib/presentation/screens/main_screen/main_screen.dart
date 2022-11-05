@@ -53,11 +53,11 @@ class MainScreen extends StatelessWidget {
               ),
             ],
           ),
-          BlocBuilder<PolygonLoaderCubit, Map?>(
+          BlocBuilder<PolygonLoaderCubit, DownloadedState>(
               builder: (_, data) => PointerInterceptor(
                     child: AnimatedSwitcher(
                         duration: const Duration(milliseconds: 100),
-                        child: data == null ? Loader() : const SizedBox()),
+                        child: data == DownloadedState.inProgress ? Loader() : const SizedBox()),
                   ))
         ],
       )),

@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
       home: MultiBlocProvider(
         providers: [
           BlocProvider(
-            create: (_) => PolygonLoaderCubit(null),
+            create: (_) => PolygonLoaderCubit(DownloadedState.none),
           ),
           BlocProvider(
             create: (_) => SidebarCubit(null),
