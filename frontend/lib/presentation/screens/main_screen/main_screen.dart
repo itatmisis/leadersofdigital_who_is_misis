@@ -51,7 +51,7 @@ class _MainScreenState extends State<MainScreen> {
                           height: c.maxHeight,
                           duration: const Duration(milliseconds: 200),
                           child: PointerInterceptor(
-                            child: SideBar(),
+                            child: SideBar(type: m.toString(),),
                           ),
                         ),
                       ),
