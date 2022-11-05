@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ import 'package:frontend/domain/models/start_model.dart';
 import 'package:frontend/presentation/screens/main_screen/bloc/layers_cubit.dart';
 import 'package:frontend/presentation/screens/main_screen/bloc/polygon_loader_cubit.dart';
 import 'package:frontend/presentation/screens/main_screen/bloc/sidebar_cubit.dart';
+import 'package:frontend/presentation/screens/main_screen/map/controller_extensions/on_click_handler.dart';
 import 'package:frontend/presentation/screens/main_screen/map/plus_minus.dart';
 import 'package:frontend/presentation/screens/main_screen/widgets/short_menu.dart';
 import 'package:frontend/presentation/theme/app_colors.dart';
@@ -28,11 +30,11 @@ class FillOptionContainer {
 
   @override
   bool operator==(Object o) {
-    if (o is FillOptions && o.fillColor == fillOptions.fillColor) {
+    if (o is FillOptions && o.fillColor == fillOptions.fillColor && fillOptions.geometry == o.geometry) {
       return true;
     }
 
-    if (o is FillOptionContainer && o.fillOptions.fillColor == fillOptions.fillColor) {
+    if (o is FillOptionContainer && o.fillOptions.fillColor == fillOptions.fillColor && fillOptions.geometry == o.fillOptions.geometry) {
       return true;
     }
 
@@ -60,7 +62,7 @@ class _MapWidgetState extends State<MapWidget> {
   OverlayEntry? shortMenu;
   bool isShortMenuActive = false;
 
-  Fill? lastPressedPoly;
+  Point<double>? point;
 
   @override
   void initState() {
@@ -90,14 +92,10 @@ class _MapWidgetState extends State<MapWidget> {
       }
     });
 
-    context.read<SidebarCubit>().stream.listen((AreaModel? event) {
-      if (controller != null && event == null) {
-        if (lastPressedPoly != null){
-
-          controller!.updateFill(lastPressedPoly!,
-              const FillOptions(fillColor: '#D4BDDB', fillOpacity: 0.3));
-
-          lastPressedPoly = null;
+    context.read<SidebarCubit>().stream.listen((event) {
+      if (controller! != null) {
+        if (event == null) {
+          OnClickHandler.close();
         }
       }
     });
@@ -130,11 +128,28 @@ class _MapWidgetState extends State<MapWidget> {
 
     List l = await drawFills(mapPolygons.keys.toList(), fillColor, outlineColor);
 
-    controller!.onFillTapped.add((argument) {
+    controller!.onFillTapped.add((argument) async {
       FillOptionContainer c = FillOptionContainer(argument.options);
       if (mapPolygons.containsKey(c)) {
-        print(T.toString());
+        await Timer(Duration(milliseconds: 100), () {});
+        onFillClick<T>(mapPolygons[c]!, argument, point!);
       }
+    });
+  }
+
+  void onFillClick<T>(AreaModel model, Fill fill, Point<num> p) {
+    String? color = fill.options.fillColor;
+    OnClickHandler.choose(fill, onChoose: (f) {
+      if (OnClickHandler.isChosen) {
+        OnClickHandler.close();
+      }
+
+      controller!.updateFill(fill, fill.options.copyWith(FillOptions(fillColor: AppColors.veryPeri400.toHexTriplet())));
+      _showShortMenu(Point<double>(p.x.toDouble(), p.y.toDouble()));
+      context.read<SidebarCubit>().setCurrentArea(model);
+    }, onClose: (f) {
+      controller!.updateFill(f, fill.options.copyWith(FillOptions(fillColor: color)));
+      _hideShortMenu();
     });
   }
 
@@ -144,20 +159,9 @@ class _MapWidgetState extends State<MapWidget> {
     return await controller!.addFills(f);
   }
 
-  void onPolyPressed(Fill argument) {
-    if (lastPressedPoly != null) {
-      controller!.updateFill(lastPressedPoly!,
-          const FillOptions(fillColor: '#D4BDDB', fillOpacity: 0.3));
-    }
-    lastPressedPoly = argument;
-
-    context.read<SidebarCubit>().setCurrentArea(LandModel(123,[[]]));
-    controller!.updateFill(argument, const FillOptions(fillColor: '#8B559B', fillOpacity: 0.5));
-  }
-
   void _showShortMenu(Point<double> click) {
     isShortMenuActive = true;
-
+    setState(() {});
     OverlayState? overlayState = Overlay.of(context);
     shortMenu = OverlayEntry(
         builder: (_) => Positioned(
@@ -175,6 +179,7 @@ class _MapWidgetState extends State<MapWidget> {
   void _hideShortMenu() {
     if (isShortMenuActive) {
       isShortMenuActive = false;
+      setState(() {});
       shortMenu?.remove();
     }
   }
@@ -190,6 +195,8 @@ class _MapWidgetState extends State<MapWidget> {
             southwest: const LatLng(55.37949118840644, 36.75537470776375),
           )),
           compassEnabled: false,
+          zoomGesturesEnabled: isShortMenuActive? false : true,
+          scrollGesturesEnabled: isShortMenuActive? false : true,
           accessToken:
           'pk.eyJ1IjoicGl0dXNhbm9uaW1vdXMiLCJhIjoiY2twcHk5M2VtMDZvZjJ2bzEzMHNhNDM1diJ9.8BLcJknh8FvUVLJRZbHJDQ',
           styleString:
@@ -200,6 +207,10 @@ class _MapWidgetState extends State<MapWidget> {
           ),
           onMapCreated: (MapboxMapController c) {
             controller = c;
+
+            controller!.onFeatureTapped.add((id, p, coordinates) {
+              point = p;
+            });
           },
           onMapClick: (p, l) {
             _hideShortMenu();

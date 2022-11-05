@@ -9,7 +9,10 @@ import 'package:frontend/presentation/theme/app_colors.dart';
 import 'package:frontend/presentation/theme/app_fonts.dart';
 
 class SideBar extends StatelessWidget {
-  const SideBar({Key? key}) : super(key: key);
+
+  String? type;
+
+  SideBar({Key? key, this.type}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +63,7 @@ class SideBar extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text("77:01:0002009:29", style: AppFonts.heading1),
-                        Text("Земельный участок",
+                        Text(type?? '',
                             style: AppFonts.subtitle1
                                 .copyWith(color: AppColors.gray)),
                       ],
