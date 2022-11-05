@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
           ),
           BlocProvider(
             create: (_) => SidebarCubit(null),
-          )
+          ),
         ],
         child: const MainScreen(),
       )
