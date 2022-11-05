@@ -4,4 +4,5 @@ class ApiRoutes {
   static const getCulturalHeritage = '/cultural_heritage/polygons';
   static const getSanitary = '/sanitary_protected_zones/polygons';
   static const getStartGrounds = '/start_grounds/polygons';
+  static const getOrganizations='/organizations/points';
 }
