@@ -11,8 +11,16 @@ import 'package:pointer_interceptor/pointer_interceptor.dart';
 
 import 'sidebar/side_bar.dart';
 
-class MainScreen extends StatelessWidget {
+class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
+
+  @override
+  State<MainScreen> createState() => _MainScreenState();
+}
+
+class _MainScreenState extends State<MainScreen> {
+
+  int? currentRightPage;
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +31,13 @@ class MainScreen extends StatelessWidget {
         children: [
           Column(
             children: [
-              const Topbar(),
+              Topbar(currentRightPage: currentRightPage, onRightMenuPressed: (c) {setState(() {
+                if (currentRightPage == c) {
+                  currentRightPage = null;
+                } else {
+                  currentRightPage = c;
+                }
+              });}),
               Expanded(
                 child: LayoutBuilder(
                   builder: (_, c) => Stack(
@@ -40,9 +54,11 @@ class MainScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                      Positioned(
+                      AnimatedPositioned(
                         top: 0,
-                        right: 0,
+                        right: currentRightPage == 0? 0: -450,
+                        height: c.maxHeight,
+                        duration: const Duration(milliseconds: 200),
                         child: PointerInterceptor(
                           child: LayersBar(),
                         ),
@@ -53,11 +69,11 @@ class MainScreen extends StatelessWidget {
               ),
             ],
           ),
-          BlocBuilder<PolygonLoaderCubit, Map?>(
+          BlocBuilder<PolygonLoaderCubit, DownloadedState>(
               builder: (_, data) => PointerInterceptor(
                     child: AnimatedSwitcher(
                         duration: const Duration(milliseconds: 100),
-                        child: data == null ? Loader() : const SizedBox()),
+                        child: data == DownloadedState.inProgress ? Loader() : const SizedBox()),
                   ))
         ],
       )),

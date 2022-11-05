@@ -1,4 +1,10 @@
-import 'package:frontend/domain/models/area_model.dart';
+import 'package:frontend/domain/models/building_model.dart';
+import 'package:frontend/domain/models/capital_model.dart';
+import 'package:frontend/domain/models/geographic_model.dart';
+import 'package:frontend/domain/models/land_model.dart';
+import 'package:frontend/domain/models/organization_model.dart';
+import 'package:frontend/domain/models/sanitary_model.dart';
+import 'package:frontend/domain/models/start_model.dart';
 
 class Storage {
 
@@ -7,9 +13,12 @@ class Storage {
   factory Storage() => _instance;
   Storage._();
 
-  Map<int, AreaModel> _polygons = {};
+  Map<int, LandModel> lands = {};
+  Map<int, CapitalModel> capitals = {};
+  Map<int, OrganizationModel> organizations = {};
+  Map<int, SanitaryModel> sanitaries = {};
+  Map<int, StartModel> starts = {};
+  Map<int, BuildingModel> buildings = {};
 
-  Map<int, AreaModel> get polygons => _polygons;
-  set polygons(Map<int, AreaModel>  p) => _polygons = p;
-
+  List<Map<int, GeographicModel>> get allLayers => [lands, capitals, organizations, sanitaries, starts, buildings];
 }
