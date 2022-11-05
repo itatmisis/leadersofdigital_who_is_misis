@@ -6,11 +6,7 @@ import 'package:frontend/domain/models/geographic_model.dart';
 import 'package:frontend/domain/models/land_model.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 
-enum DownloadedState {
-  none,
-  inProgress,
-  downloaded
-}
+enum DownloadedState { none, inProgress, downloaded }
 
 class PolygonLoaderCubit extends Cubit<DownloadedState> {
   DownloadedState downloaded = DownloadedState.none;
@@ -31,6 +27,7 @@ class PolygonLoaderCubit extends Cubit<DownloadedState> {
 
       Storage().lands = await Api().getLands();
       Storage().capitals = await Api().getCapital();
+      Storage().organizations = await Api().getOrganizations();
       Storage().sanitaries = await Api().getSanitary();
       Storage().starts = await Api().getStartGrounds();
 
