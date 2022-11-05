@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+extension ColorX on Color {
+  String toHexTriplet() => '#${(value & 0xFFFFFF).toRadixString(16).padLeft(6, '0').toUpperCase()}';
+}
+
 class AppColors {
   static const Color neutral900 = Color(0xFF252525);
   static const Color neutral800 = Color(0xFF3A3A3A);
