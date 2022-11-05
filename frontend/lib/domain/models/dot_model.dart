@@ -6,6 +6,6 @@ abstract class DotModel extends GeographicModel {
 
   late LatLng location;
   DotModel.fromJson(json) {
-     location=(LatLng(json["lon"]!, json["lat"]!));
+     location=(LatLng(json["lat"]!, json["lon"]!));
     }
   }
