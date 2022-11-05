@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/data/storage/storage.dart';
 import 'package:frontend/domain/models/area_model.dart';
 import 'package:frontend/domain/models/land_model.dart';
 import 'package:frontend/presentation/screens/main_screen/bloc/polygon_loader_cubit.dart';
@@ -33,10 +34,13 @@ class _MapWidgetState extends State<MapWidget> {
   @override
   void initState() {
     super.initState();
-    context.read<PolygonLoaderCubit>().stream.listen((Map<int, AreaModel>? event) {
+    context.read<PolygonLoaderCubit>().stream.listen((event) {
       if (controller != null) {
-        if (event != null) {
-          drawFills(event);
+        if (event != DownloadedState.downloaded) {
+          drawFills(Storage().lands);
+          drawFills(Storage().capitals);
+          drawFills(Storage().sanitaries);
+          drawFills(Storage().starts);
         }
       }
     });
