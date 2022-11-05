@@ -15,6 +15,8 @@ tags:
     description: Земельные участки (ЗУ)
   - name: capital_construction_works
     description: Объекты капитального строительства (ОКС)
+  - name: organizations
+    description: Организации
   - name: cultural_heritage
     description: Объекты культурного наследия
   - name: sanitary_protected_zones
@@ -91,6 +93,13 @@ paths:
       summary: ЗУ по oid
       description: Получить информацию о земельном участке по oid
       operationId: landsGetByOid
+      parameters:
+        - name: oid
+          in: path
+          description: oid of land
+          required: true
+          schema:
+            type: integer
       responses:
         "200":
           description: Successful operation
@@ -117,6 +126,31 @@ paths:
                         format: double
         "404":
           description: Land with oid {oid} not found
+
+  /organizations/points:
+    get:
+      tags:
+        - organizations
+      summary: Местоположение организаций
+      description: Получить местоположение всех орагнизаций
+      operationId: organizationsGetPoints
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  organizations:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        oid:
+                          type: integer
+                        point:
+                          $ref: "#/components/schemas/Point"
 
 
   /capital_construction_works/polygons:

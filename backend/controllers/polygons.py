@@ -37,3 +37,12 @@ def get_polygons_by_bbox_controller():
         "lands": services.polygons.serialize_polygons(selected_lands)
     }
     return flask.jsonify(response)
+
+
+@app.route("/api/organizations/points")
+def get_organization_points():
+    data_json = services.polygons.get_organizations_json()
+    response = flask.make_response(data_json, 200)
+    response.headers["Content-Type"] = "application/json"
+    response.cache_control.max_age = app.config["CACHE_MAX_AGE"]
+    return response

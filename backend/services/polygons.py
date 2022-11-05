@@ -2,6 +2,7 @@ import json
 import os.path
 
 from backend import db, app
+from backend.data.models import Organization
 from backend.data.models.base_polygonal_model import BasePolygonalModel
 import shapely.geometry
 import geoalchemy2.shape
@@ -62,3 +63,24 @@ def split_multipoint_by_parts(points: list[shapely.geometry.Point], parts: list[
         resp.append(points[parts[i]:parts[i + 1]])
     resp.append(points[parts[-1]:])
     return resp
+
+
+def get_organizations_json():
+    file_path = os.path.join(app.config["PREPROCESSED_DATA_PATH"], "organizations.json")
+    if os.path.exists(file_path):
+        with open(file_path) as file:
+            return file.read()
+    else:
+        objects = db.session.query(Organization).all()
+        data_json = {
+            "organizations": [
+                {
+                    "oid": obj.oid,
+                    "point": serialize_point(geoalchemy2.shape.to_shape(obj.point))
+                } for obj in objects
+            ]
+        }
+        with open(file_path, "w") as file:
+            dump = json.dumps(data_json)
+            file.write(dump)
+            return dump
