@@ -1,14 +1,17 @@
 import os
 import time
 
+import geoalchemy2.shape
 import openpyxl
 import shapefile
+import shapely.geometry
 from alive_progress import alive_bar
 from shapely import geometry, wkt
 
 from backend import db, app
 from backend.data.models import *
 from backend.data.models.start_ground import StartGround
+from backend.services.polygons import split_multipoint_by_parts
 from backend.tools import coord_convert
 
 converter = coord_convert.CoordConverter()
@@ -125,7 +128,8 @@ def load_organizations(path_to_dataset):  # Организации СВАО_СА
         for shaperec in reader.shapeRecords():
             obj = Organization(
                 oid=shaperec.shape.oid,
-                point=wkt.dumps(geometry.Point(converter.transform(*shaperec.shape.points[0], coord_convert.CRS_MSK))),
+                point=wkt.dumps(
+                    geometry.Point(converter.transform(*shaperec.shape.points[0], coord_convert.CRS_MSK)[::-1])),
 
                 name=shaperec.record.name,
                 kol_mest=shaperec.record.kol_mest
@@ -236,3 +240,56 @@ def load_buildings(path_to_dataset):
         )
         db.session.merge(obj)
     wb.close()
+
+
+def load_extended_lands():
+    db.session.execute(TRUNCATE_TABLE.format(ExtendedLand.__tablename__))
+
+    for land in db.session.query(Land).all():
+        polygons = split_multipoint_by_parts(geoalchemy2.shape.to_shape(land.points).geoms,
+                                             land.parts)
+        land_multipolygon = shapely.geometry.MultiPolygon(polygons)
+
+        obj = ExtendedLand(
+            land_oid=land.oid,
+            start_ground_oid=None,
+
+            is_sanitary_protected_zone=check_if_land_is_sanitary_protected_zone(land_multipolygon),
+            is_cultural_heritage=check_if_land_is_cultural_heritage(land_multipolygon)
+
+
+        )
+
+
+spz_multipolygon = None
+
+
+def check_if_land_is_sanitary_protected_zone(land_multipolygon: shapely.geometry.MultiPolygon) -> bool:
+    global spz_multipolygon
+
+    if spz_multipolygon is None:
+        all_polygons = []
+        for spz in db.session(SanitaryProtectedZone).all():
+            spz_polygons = split_multipoint_by_parts(geoalchemy2.shape.to_shape(spz.points).geoms,
+                                                     spz.parts)
+            all_polygons.extend(spz_polygons)
+        spz_multipolygon = shapely.geometry.MultiPolygon(all_polygons)
+
+    return spz_multipolygon.intersects(land_multipolygon)
+
+
+cul_multipolygon = None
+
+
+def check_if_land_is_cultural_heritage(land_multipolygon: shapely.geometry.MultiPolygon) -> bool:
+    global cul_multipolygon
+
+    if cul_multipolygon is None:
+        all_polygons = []
+        for cul in db.session(CulturalHeritage).all():
+            cul_polygons = split_multipoint_by_parts(geoalchemy2.shape.to_shape(cul.points).geoms,
+                                                     cul.parts)
+            all_polygons.extend(cul_polygons)
+        cul_multipolygon = shapely.geometry.MultiPolygon(all_polygons)
+
+    return cul_multipolygon.intersects(land_multipolygon)
