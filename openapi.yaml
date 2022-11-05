@@ -84,6 +84,41 @@ paths:
                           type: array
                           items:
                             $ref: "#/components/schemas/Polygon"
+  /lands/{oid}:
+    get:
+      tags:
+        - lands
+      summary: ЗУ по oid
+      description: Получить информацию о земельном участке по oid
+      operationId: landsGetByOid
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  land:
+                    type: object
+                    properties:
+                      oid:
+                        type: integer
+                      cadnum:
+                        type: string
+                      address:
+                        type: string
+                      has_effect:
+                        type: boolean
+                      property_t:
+                        type: integer
+                      shape_area:
+                        type: number
+                        format: double
+        "404":
+          description: Land with oid {oid} not found
+
+
   /capital_construction_works/polygons:
     get:
       tags:

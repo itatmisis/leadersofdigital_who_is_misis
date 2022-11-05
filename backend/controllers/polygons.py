@@ -15,6 +15,7 @@ def get_polygons_controller(entity):
 
     response = flask.make_response(data_json, 200)
     response.headers["Content-Type"] = "application/json"
+    response.cache_control.max_age = app.config["CACHE_MAX_AGE"]
     return response
 
 

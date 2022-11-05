@@ -3,6 +3,7 @@ import os
 from dotenv import load_dotenv
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+import backend.config
 
 dotenv_path = os.path.join(os.path.dirname(__file__), "..", ".env")
 if os.path.exists(dotenv_path):
@@ -17,7 +18,7 @@ if os.environ.get("DEBUG") == "true":
     cors = flask_cors.CORS(app)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DB_URL")
-app.config["PREPROCESSED_DATA_PATH"] = "backend/data/preprocessed"
+app.config.update(config.CONFIG)
 if not os.path.exists(app.config["PREPROCESSED_DATA_PATH"]):
     os.mkdir(app.config["PREPROCESSED_DATA_PATH"])
 
