@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/domain/models/area_model.dart';
+import 'package:frontend/presentation/screens/main_screen/bloc/layers_cubit.dart';
 import 'package:frontend/presentation/screens/main_screen/bloc/polygon_loader_cubit.dart';
 import 'package:frontend/presentation/screens/main_screen/bloc/sidebar_cubit.dart';
 import 'package:frontend/presentation/screens/main_screen/layers_bar/layers_bar.dart';
@@ -60,7 +61,7 @@ class _MainScreenState extends State<MainScreen> {
                         height: c.maxHeight,
                         duration: const Duration(milliseconds: 200),
                         child: PointerInterceptor(
-                          child: LayersBar(),
+                          child: LayersBar(onChanged: (l) => context.read<LayersCubit>().setLayers(l),),
                         ),
                       ),
                     ],

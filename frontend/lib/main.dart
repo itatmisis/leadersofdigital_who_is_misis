@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/presentation/screens/main_screen/bloc/layers_cubit.dart';
 import 'package:frontend/presentation/screens/main_screen/bloc/polygon_loader_cubit.dart';
 import 'package:frontend/presentation/screens/main_screen/bloc/sidebar_cubit.dart';
 import 'package:frontend/presentation/screens/main_screen/main_screen.dart';
@@ -28,6 +29,9 @@ class MyApp extends StatelessWidget {
           ),
           BlocProvider(
             create: (_) => SidebarCubit(null),
+          ),
+          BlocProvider(
+            create: (_) => LayersCubit([true, true, true, true, true]),
           ),
         ],
         child: const MainScreen(),

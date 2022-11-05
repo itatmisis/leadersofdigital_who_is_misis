@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/data/storage/storage.dart';
 import 'package:frontend/domain/models/area_model.dart';
 import 'package:frontend/domain/models/land_model.dart';
+import 'package:frontend/presentation/screens/main_screen/bloc/layers_cubit.dart';
 import 'package:frontend/presentation/screens/main_screen/bloc/polygon_loader_cubit.dart';
 import 'package:frontend/presentation/screens/main_screen/bloc/sidebar_cubit.dart';
 import 'package:frontend/presentation/screens/main_screen/map/plus_minus.dart';
@@ -41,6 +42,19 @@ class _MapWidgetState extends State<MapWidget> {
           drawFills(Storage().capitals);
           drawFills(Storage().sanitaries);
           drawFills(Storage().starts);
+        }
+      }
+    });
+
+    context.read<LayersCubit>().stream.listen((event) {
+      if (controller != null) {
+        if (context.read<PolygonLoaderCubit>().downloaded == DownloadedState.downloaded) {
+          controller!.clearFills();
+
+          if (event[0]) drawFills(Storage().lands);
+          if (event[1]) drawFills(Storage().capitals);
+          if (event[3]) drawFills(Storage().sanitaries);
+          if (event[4]) drawFills(Storage().starts);
         }
       }
     });
