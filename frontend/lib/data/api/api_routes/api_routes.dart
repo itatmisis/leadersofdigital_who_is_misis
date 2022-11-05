@@ -1,4 +1,7 @@
 class ApiRoutes {
-  static const getLands = '/api/lands/polygons';
-  static const getCapitalConstructionWorks = '/api/lands/polygons';
+  static const getLands = '/lands/polygons';
+  static const getCapital = '/capital_construction_works/polygons';
+  static const getCulturalHeritage = '/cultural_heritage/polygons';
+  static const getSanitary = '/sanitary_protected_zones/polygons';
+  static const getStartGrounds = '/start_grounds/polygons';
 }
