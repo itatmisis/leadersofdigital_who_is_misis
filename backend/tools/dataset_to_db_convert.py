@@ -268,7 +268,7 @@ def load_extended_lands():
         )
         db.session.add(obj)
         db.session.commit()
-#         load_extended_capital_construction_works(obj, land_multipolygon)
+        load_extended_capital_construction_works(obj, land.points)
 
 
 #         # capital_construction_works = db.session.query(CapitalConstructionWorks).select(.points=)
@@ -308,23 +308,25 @@ def get_bad_building_data(land: Land) -> dict:
     return bad_building_data
 
 
-# def load_extended_capital_construction_works(extended_land, land_multipolygon):
-#     for oks in db.session(CapitalConstructionWorks).all():
-#         oks_multipolygon = shapely.geometry.MultiPolygon(split_multipoint_by_parts(geoalchemy2.shape.to_shape(oks.points).geoms,
-#                                                      oks.parts))
-#         if land_multipolygon.intersects(oks_multipolygon):
-#             obj = ExtendedCapitalConstructionWorks(
-#                 oid=oks.oid,
-#                 habitable=oks.habitable,
-#                 area=oks.area,
-#                 year_built=oks.year_built,
-#                 wall_material=oks.wall_material,
-#                 hazardous=oks.hazardous,
-#                 typical=oks.typical,
-#                 extended_land_id=extended_land.id,
-#             )
-#             db.session.add(obj)
-#             db.session.commit()
+def load_extended_capital_construction_works(extended_land, land_multipolygon):
+    pass
+    # TODO: do sql query using postgis function
+    # for oks in db.session(CapitalConstructionWorks).all():
+    #     oks_multipolygon = shapely.geometry.MultiPolygon(split_multipoint_by_parts(geoalchemy2.shape.to_shape(oks.points).geoms,
+    #                                                  oks.parts))
+    #     if land_multipolygon.intersects(oks_multipolygon):
+    #         obj = ExtendedCapitalConstructionWorks(
+    #             oid=oks.oid,
+    #             habitable=oks.habitable,
+    #             area=oks.area,
+    #             year_built=oks.year_built,
+    #             wall_material=oks.wall_material,
+    #             hazardous=oks.hazardous,
+    #             typical=oks.typical,
+    #             extended_land_id=extended_land.id,
+    #         )
+    #         db.session.add(obj)
+    #         db.session.commit()
 
 
 # def load_extended_organizations(extended_oks, oks_multipolygon):
