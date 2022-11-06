@@ -122,6 +122,6 @@ def weighted_average(values, coeffs):
     if (len(values)) != len(coeffs):
         raise ValueError
     try:
-        return sum(map(lambda x: x[0] * x[1], zip(values, coeffs))) / sum(coeffs)
+        return float(sum(map(lambda x: x[0] * x[1], zip(values, coeffs))) / sum(coeffs))
     except ZeroDivisionError:
         return 0
