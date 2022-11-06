@@ -38,11 +38,12 @@ def serialize_polygons(objects: list[BasePolygonalModel]):
         {
             "oid": obj.oid,
             "polygons": [
-                list(map(serialize_point, polygon))
-                for polygon in split_multipoint_by_parts(
-                    geoalchemy2.shape.to_shape(obj.points).geoms,
-                    obj.parts
-                )
+                list(map(serialize_point, list(map(lambda x: shapely.geometry.Point(*x), polygon.exterior.coords))))
+                # for polygon in split_multipoint_by_parts(
+                #     geoalchemy2.shape.to_shape(obj.points).geoms,
+                #     obj.parts
+                # )
+                for polygon in geoalchemy2.shape.to_shape(obj.points).geoms
             ]
         } for obj in objects
     ]

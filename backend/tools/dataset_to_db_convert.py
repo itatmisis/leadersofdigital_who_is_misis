@@ -26,7 +26,7 @@ DATASET_PATHS = {
     "bad_records": "Аварийные_Самовольные_Несоответствие_ВРИ_СВАО_САО.XLSX",
     "buildings": "Здания СВАО_САО жилое_нежилое.xlsx"
 }
-TRUNCATE_TABLE = "TRUNCATE TABLE {}"
+TRUNCATE_TABLE = "TRUNCATE TABLE {} CASCADE"
 YES = "Да"
 HABITABLE_STR = "жилое"
 
@@ -82,10 +82,11 @@ def load_lands(path_to_dataset):  # ЗУ
     reader = shapefile.Reader(os.path.join(path_to_dataset, DATASET_PATHS["lands"]), encoding="cp1251")
     with alive_bar(len(reader.shapeRecords())) as bar:
         for shaperec in reader.shapeRecords():
+            splited_multipoints = split_multipoint_by_parts(list(map(lambda x: shapely.geometry.Point(*x), convert_multipoint(shaperec.shape.points))), shaperec.shape.parts)
             obj = Land(
                 oid=shaperec.shape.oid,
                 parts=list(shaperec.shape.parts),
-                points=wkt.dumps(geometry.MultiPoint(convert_multipoint(shaperec.shape.points))),
+                points=wkt.dumps(geometry.MultiPolygon(list(map(lambda x: geometry.Polygon(x), splited_multipoints)))),
                 bbox=wkt.dumps(geometry.box(*convert_bbox(*shaperec.shape.bbox))),
 
                 cadnum=shaperec.record.DESCR,
@@ -105,10 +106,13 @@ def load_capital(path_to_dataset):  # ОКС
     reader = shapefile.Reader(os.path.join(path_to_dataset, DATASET_PATHS["capital"]), encoding="cp1251")
     with alive_bar(len(reader.shapeRecords())) as bar:
         for shaperec in reader.shapeRecords():
+            splited_multipoints = split_multipoint_by_parts(list(map(lambda x: shapely.geometry.Point(*x), convert_multipoint(shaperec.shape.points))), shaperec.shape.parts)
+
             obj = CapitalConstructionWorks(
                 oid=shaperec.shape.oid,
                 parts=list(shaperec.shape.parts),
-                points=wkt.dumps(geometry.MultiPoint(convert_multipoint(shaperec.shape.points))),
+                points=wkt.dumps(geometry.MultiPolygon(list(map(lambda x: geometry.Polygon(x), splited_multipoints)))),
+
                 bbox=wkt.dumps(geometry.box(*convert_bbox(*shaperec.shape.bbox))),
 
                 cadnum=shaperec.record.cadnum,
@@ -145,10 +149,12 @@ def load_protected_zones(path_to_dataset):  # Санитарно-защитны�
     reader = shapefile.Reader(os.path.join(path_to_dataset, DATASET_PATHS["protected_zones"]), encoding="cp1251")
     with alive_bar(len(reader.shapeRecords())) as bar:
         for shaperec in reader.shapeRecords():
+            splited_multipoints = split_multipoint_by_parts(list(map(lambda x: shapely.geometry.Point(*x), convert_multipoint(shaperec.shape.points))), shaperec.shape.parts)
+
             obj = SanitaryProtectedZone(
                 oid=shaperec.shape.oid,
                 parts=list(shaperec.shape.parts),
-                points=wkt.dumps(geometry.MultiPoint(convert_multipoint(shaperec.shape.points))),
+                points=wkt.dumps(geometry.MultiPolygon(list(map(lambda x: geometry.Polygon(x), splited_multipoints)))),
                 bbox=wkt.dumps(geometry.box(*convert_bbox(*shaperec.shape.bbox))),
 
                 zone_type=shaperec.record.VID_ZOUIT
@@ -164,10 +170,12 @@ def load_start_grounds(path_to_dataset):  # Стартовые площадки
     reader = shapefile.Reader(os.path.join(path_to_dataset, DATASET_PATHS["start_grounds"]), encoding="cp1251")
     with alive_bar(len(reader.shapeRecords())) as bar:
         for shaperec in reader.shapeRecords():
+            splited_multipoints = split_multipoint_by_parts(list(map(lambda x: shapely.geometry.Point(*x), convert_multipoint(shaperec.shape.points))), shaperec.shape.parts)
+
             obj = StartGround(
                 oid=shaperec.shape.oid,
                 parts=list(shaperec.shape.parts),
-                points=wkt.dumps(geometry.MultiPoint(convert_multipoint(shaperec.shape.points))),
+                points=wkt.dumps(geometry.MultiPolygon(list(map(lambda x: geometry.Polygon(x), splited_multipoints)))),
                 bbox=wkt.dumps(geometry.box(*convert_bbox(*shaperec.shape.bbox))),
 
                 address=shaperec.record.address,
@@ -184,10 +192,12 @@ def load_cultural_inheritance(path_to_dataset):  # Территории объе
     reader = shapefile.Reader(os.path.join(path_to_dataset, DATASET_PATHS["cultural_inheritance"]), encoding="cp1251")
     with alive_bar(len(reader.shapeRecords())) as bar:
         for shaperec in reader.shapeRecords():
+            splited_multipoints = split_multipoint_by_parts(list(map(lambda x: shapely.geometry.Point(*x), convert_multipoint(shaperec.shape.points))), shaperec.shape.parts)
+
             obj = CulturalHeritage(
                 oid=shaperec.shape.oid,
                 parts=list(shaperec.shape.parts),
-                points=wkt.dumps(geometry.MultiPoint(convert_multipoint(shaperec.shape.points))),
+                points=wkt.dumps(geometry.MultiPolygon(list(map(lambda x: geometry.Polygon(x), splited_multipoints)))),
                 bbox=wkt.dumps(geometry.box(*convert_bbox(*shaperec.shape.bbox))),
 
                 name=shaperec.record.name,
@@ -246,20 +256,93 @@ def load_extended_lands():
     db.session.execute(TRUNCATE_TABLE.format(ExtendedLand.__tablename__))
 
     for land in db.session.query(Land).all():
-        polygons = split_multipoint_by_parts(geoalchemy2.shape.to_shape(land.points).geoms,
-                                             land.parts)
-        land_multipolygon = shapely.geometry.MultiPolygon(polygons)
-
         obj = ExtendedLand(
             land_oid=land.oid,
             start_ground_oid=None,
 
-            is_sanitary_protected_zone=check_if_land_is_sanitary_protected_zone(land_multipolygon),
-            is_cultural_heritage=check_if_land_is_cultural_heritage(land_multipolygon)
-
+            is_sanitary_protected_zone=check_if_land_is_sanitary_protected_zone(land.points),
+            is_cultural_heritage=check_if_land_is_cultural_heritage(land.points),
+            land=land,
+            **get_bad_building_data(land),
 
         )
+        db.session.add(obj)
+        db.session.commit()
+#         load_extended_capital_construction_works(obj, land_multipolygon)
 
+
+#         # capital_construction_works = db.session.query(CapitalConstructionWorks).select(.points=)
+
+    for start_ground in db.session.query(StartGround).all():
+        obj = ExtendedLand(
+            land_oid=None,
+            start_ground_oid=start_ground.oid,
+
+            is_sanitary_protected_zone=check_if_land_is_sanitary_protected_zone(start_ground_multipolygon),
+            is_cultural_heritage=check_if_land_is_cultural_heritage(start_ground_multipolygon),
+            start_ground=start_ground,
+
+        )
+        db.session.add(obj)
+        db.session.commit()
+        load_extended_capital_construction_works(obj, start_ground_multipolygon)
+
+
+
+def get_bad_building_data(land: Land) -> dict:
+    bad_building = BadBuilding.query.filter_by(cadnum=land.cadnum).get()
+    bad_building_data = {
+        'is_unauthorized': None,
+        'is_hazardous': None,
+        'is_mismatch': None,
+
+    }
+    if bad_building is None:
+        return bad_building_data
+    else:
+        bad_building_data = {
+            'is_unauthorized': bad_building.unauthorized,
+            'is_hazardous': bad_building.hazardous,
+            'is_mismatch': bad_building.mismatch
+        }
+    return bad_building_data
+
+
+# def load_extended_capital_construction_works(extended_land, land_multipolygon):
+#     for oks in db.session(CapitalConstructionWorks).all():
+#         oks_multipolygon = shapely.geometry.MultiPolygon(split_multipoint_by_parts(geoalchemy2.shape.to_shape(oks.points).geoms,
+#                                                      oks.parts))
+#         if land_multipolygon.intersects(oks_multipolygon):
+#             obj = ExtendedCapitalConstructionWorks(
+#                 oid=oks.oid,
+#                 habitable=oks.habitable,
+#                 area=oks.area,
+#                 year_built=oks.year_built,
+#                 wall_material=oks.wall_material,
+#                 hazardous=oks.hazardous,
+#                 typical=oks.typical,
+#                 extended_land_id=extended_land.id,
+#             )
+#             db.session.add(obj)
+#             db.session.commit()
+
+
+# def load_extended_organizations(extended_oks, oks_multipolygon):
+#     for org in db.session(ExtendedOrganization).all():
+#         geoalchemy2.functions.ST_Contains()
+#         # if land_multipolygon.intersects(oks_multipolygon):
+#         #     obj = ExtendedCapitalConstructionWorks(
+#         #         oid=oks.oid,
+#         #         habitable=oks.habitable,
+#         #         area=oks.area,
+#         #         year_built=oks.year_built,
+#         #         wall_material=oks.wall_material,
+#         #         hazardous=oks.hazardous,
+#         #         typical=oks.typical,
+#         #         extended_land_id=extended_land.id,
+#         #     )
+#             # db.session.add(obj)
+#             # db.session.commit()
 
 spz_multipolygon = None
 

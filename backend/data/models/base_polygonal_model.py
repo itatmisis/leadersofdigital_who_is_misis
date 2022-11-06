@@ -7,5 +7,5 @@ from backend.data.models.base_shp_model import BaseSHPModel
 
 class BasePolygonalModel(BaseSHPModel):
     parts = Column(ARRAY(Integer))
-    points = Column(Geometry(geometry_type="MULTIPOINT"))
+    points = Column(Geometry(geometry_type="MULTIPOLYGON"))
     bbox = Column(Geometry(geometry_type="POLYGON"))
