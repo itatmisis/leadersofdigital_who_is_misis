@@ -4,21 +4,21 @@ import 'package:frontend/presentation/screens/main_screen/topbars/topbar.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 
 import 'bbox_top_bar.dart';
-abstract class TopBarState{
+
+abstract class TopBarState {
   TopBarState();
 }
-class MainTopBarState extends TopBarState{
 
- Widget widget=const Topbar();
-  MainTopBarState(): super();
+class MainTopBarState extends TopBarState {
+  MainTopBarState() : super();
 }
-class ChooseTopBarState extends TopBarState{
-  late List<LatLng> points;
-  Widget widget=ChooseTopBar(point: points);
- ChooseTopBarState(this.points): super();
-}
-class BboxTopBarState extends TopBarState{
 
-  Widget widget=const BboxTopBar();
-    BboxTopBarState(): super();
+class ChooseTopBarState extends TopBarState {
+  List<LatLng> points;
+
+  ChooseTopBarState({required this.points}) : super();
+}
+
+class BboxTopBarState extends TopBarState {
+  BboxTopBarState() : super();
 }

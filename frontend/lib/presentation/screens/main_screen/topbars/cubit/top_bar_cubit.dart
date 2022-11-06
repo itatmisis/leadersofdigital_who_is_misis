@@ -12,7 +12,7 @@ class TopBarCubit extends Cubit<TopBarState> {
   }
 
   void paintChose(List<LatLng> points) {
-    emit(ChooseTopBarState(points));
+    emit(ChooseTopBarState(points: points));
   }
 
   void paintBbox() {

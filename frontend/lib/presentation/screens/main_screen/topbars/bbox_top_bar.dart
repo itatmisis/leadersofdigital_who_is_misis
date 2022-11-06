@@ -38,7 +38,6 @@ class BboxTopBar extends StatelessWidget {
                 SizedBox(
                   width: 20,
                 ),
-                Search.v1()
               ],
             ),
           ),

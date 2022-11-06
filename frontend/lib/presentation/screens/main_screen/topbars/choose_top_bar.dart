@@ -4,9 +4,12 @@ import 'package:frontend/presentation/theme/app_fonts.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 
 class ChooseTopBar extends StatelessWidget {
-  ChooseTopBar({Key? key, required this.point}) : super(key: key);
+  ChooseTopBar({Key? key, required List<LatLng> points}) : super(key: key) {
+    point = points;
+  }
+
   int tappedPoints = 0;
-  final List<LatLng> point;
+  late List<LatLng>? point;
 
   @override
   Widget build(BuildContext context) {
@@ -19,9 +22,9 @@ class ChooseTopBar extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                  "Вы выбрали точку 1 ${point[0].latitude} ${point[0].longitude}"),
+                  "Вы выбрали точку 1 ${point![0].latitude} ${point![0].longitude}"),
               Text(
-                  "Вы выбрали точку 2 ${point[1].latitude} ${point[1].longitude}"),
+                  "Вы выбрали точку 2 ${point![1].latitude} ${point![1].longitude}"),
             ],
           ),
           Container(
