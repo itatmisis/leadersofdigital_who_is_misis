@@ -264,6 +264,10 @@ def load_buildings(path_to_dataset):
 
 def load_extended_lands():
     db.session.execute(TRUNCATE_TABLE.format(ExtendedLand.__tablename__))
+    db.session.execute(TRUNCATE_TABLE.format(ExtendedCapitalConstructionWorks.__tablename__))
+    db.session.execute(TRUNCATE_TABLE.format(ExtendedOrganization.__tablename__))
+    db.session.commit()
+
 
     all_lands = db.session.execute("select *, st_asewkt(points) as wktpoints from lands").all()
     all_sgs = db.session.execute("select *, st_asewkt(points) as wktpoints from start_grounds").all()
@@ -280,7 +284,7 @@ def load_extended_lands():
                 **get_bad_building_data(land),
 
             )
-            db.session.add(obj)
+            db.session.merge(obj)
             db.session.commit()
             load_extended_capital_construction_works(obj, land.wktpoints)
             bar()
@@ -296,7 +300,7 @@ def load_extended_lands():
                 is_cultural_heritage=check_if_land_is_cultural_heritage(start_ground.wktpoints),
 
             )
-            db.session.add(obj)
+            db.session.merge(obj)
             db.session.commit()
             load_extended_capital_construction_works(obj, start_ground.wktpoints)
             bar()
@@ -322,10 +326,9 @@ def get_bad_building_data(land: Land) -> dict:
 
 
 def load_extended_capital_construction_works(extended_land, land_wktpoints: str):
-    db.session.execute(TRUNCATE_TABLE.format(ExtendedCapitalConstructionWorks.__tablename__))
 
     for oks in db.session.execute(f"select *, st_asewkt(points) as wktpoints from capital_construction_works "
-                                  f"where st_intersects(points, ST_makeValid('{land_wktpoints}'));").all():
+                                  f"where st_intersects(points, '{land_wktpoints}');").all():
         obj = ExtendedCapitalConstructionWorks(
             oid=oks.oid,
 
@@ -333,7 +336,7 @@ def load_extended_capital_construction_works(extended_land, land_wktpoints: str)
 
             extended_land_id=extended_land.id,
         )
-        db.session.add(obj)
+        db.session.merge(obj)
         db.session.commit()
         load_extended_organizations(obj, oks.wktpoints)
 
@@ -364,25 +367,23 @@ def get_building_data(oks: CapitalConstructionWorks) -> dict:
 
 
 def load_extended_organizations(extended_oks, oks_wktpoints):
-    db.session.execute(TRUNCATE_TABLE.format(ExtendedOrganization.__tablename__))
-
     for org in db.session.execute(f"select * from organizations "
-                                  f"where st_contains(ST_makeValid(point), ST_makeValid('{oks_wktpoints}'));").all():
+                                  f"where st_contains('{oks_wktpoints}', point);").all():
         obj = ExtendedOrganization(
             oid=org.oid,
             extended_capital_construction_works_oid=extended_oks.oid
         )
-        db.session.add(obj)
+        db.session.merge(obj)
         db.session.commit()
 
 
 def check_if_land_is_sanitary_protected_zone(land_wktpoints: str) -> bool:
     zones_intersected = db.session.execute(f"select oid from sanitary_protected_zones where "
-                                           f"st_intersects(ST_makeValid(points), ST_makeValid('{land_wktpoints}'));").all()
+                                           f"st_intersects(points, '{land_wktpoints}');").all()
     return len(zones_intersected) > 0
 
 
 def check_if_land_is_cultural_heritage(land_wktpoints: str) -> bool:
     zones_intersected = db.session.execute(f"select oid from cultural_heritage where "
-                                           f"st_intersects(ST_makeValid(points), ST_makeValid('{land_wktpoints}'));").all()
+                                           f"st_intersects(points, '{land_wktpoints}');").all()
     return len(zones_intersected) > 0
