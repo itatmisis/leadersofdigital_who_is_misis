@@ -78,18 +78,6 @@ class BboxTopBar extends StatelessWidget {
                 ),
                 Flexible(
                   child: TabButton(
-                    icon: 'assets/icons/import.svg',
-                    text: 'Импорт',
-                    isActive: currentRightPage == 2 ? true : false,
-                    onPressed: () {
-                      if (onRightMenuPressed != null) {
-                        onRightMenuPressed!(2);
-                      }
-                    },
-                  ),
-                ),
-                Flexible(
-                  child: TabButton(
                     icon: 'assets/icons/export.svg',
                     text: 'Экспорт',
                     isActive: currentRightPage == 3 ? true : false,

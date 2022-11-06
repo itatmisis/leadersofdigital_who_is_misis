@@ -37,12 +37,12 @@ class _ChooseTopBarState extends State<ChooseTopBar> {
               children: [
                 currentState.isContinueEnabled
                     ? Text(
-                        "Вы выбрали точку 1: ${widget.point1.latitude} ${widget.point1.longitude}",
+                        "Вы выбрали точку 1: ${widget.point1.latitude}, ${widget.point1.longitude}",
                         style:
                             AppFonts.heading3.copyWith(color: AppColors.white),
                       )
                     : Text(
-                        "Вы выбрали точку 2: ${widget.point2.latitude} ${widget.point2.longitude}",
+                        "Вы выбрали точку 2: ${widget.point2.latitude}, ${widget.point2.longitude}",
                         style:
                             AppFonts.heading3.copyWith(color: AppColors.white),
                       ),
@@ -64,10 +64,12 @@ class _ChooseTopBarState extends State<ChooseTopBar> {
                             },
                             child: const Text(
                               "Продолжить",
-                              style: TextStyle(color: AppColors.veryPeri500),
+                              style: TextStyle(color: AppColors.gray),
                             ),
                           )),
-                      const SizedBox(width: 16,),
+                      const SizedBox(
+                        width: 16,
+                      ),
                       Container(
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(4),
@@ -75,7 +77,8 @@ class _ChooseTopBarState extends State<ChooseTopBar> {
                           child: TextButton(
                             onPressed: () {
                               context
-                                  .read<TopBarCubit>().returnToPrevious(MainTopBarState());
+                                  .read<TopBarCubit>()
+                                  .returnToPrevious(MainTopBarState());
                             },
                             child: const Text(
                               "Удалить",
@@ -84,42 +87,48 @@ class _ChooseTopBarState extends State<ChooseTopBar> {
                           )),
                     ],
                   )
-                :
-            Row(
-              children: [
-                Container(
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(4),
-                          color: AppColors.white),
-                      child: TextButton(
-                        onPressed: () {
-                          context.read<TopBarCubit>().paintBbox();
-                        },
-                        child: const Flexible(
-                          child: Text(
-                            "Начать работу",
-                            style: TextStyle(color: AppColors.veryPeri500),
+                : Row(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(4),
+                            color: AppColors.white),
+                        child: TextButton(
+                          onPressed: () {
+                            context.read<TopBarCubit>().paintBbox();
+                          },
+                          child: const Flexible(
+                            child: Text(
+                              "Начать работу",
+                              style: TextStyle(color: AppColors.veryPeri500),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                const SizedBox(width: 16,),
-                Container(
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(4),
-                        color: AppColors.white),
-                    child: TextButton(
-                      onPressed: () {
-                        context
-                            .read<TopBarCubit>().returnToPrevious(ChooseTopBarState(p1: widget.point1, p2: widget.point2, isBeginEnabled: false, isContinueEnabled: true));
-                      },
-                      child: const Text(
-                        "Удалить",
-                        style: TextStyle(color: AppColors.veryPeri500),
+                      const SizedBox(
+                        width: 16,
                       ),
-                    )),
-              ],
-            ),
+                      Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(4),
+                            color: AppColors.white),
+                        child: TextButton(
+                          onPressed: () {
+                            context.read<TopBarCubit>().returnToPrevious(
+                                ChooseTopBarState(
+                                    p1: widget.point1,
+                                    p2: widget.point2,
+                                    isBeginEnabled: false,
+                                    isContinueEnabled: true));
+                          },
+                          child: const Text(
+                            "Удалить",
+                            style: TextStyle(color: AppColors.gray),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
           ],
         ),
       ),
