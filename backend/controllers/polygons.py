@@ -22,9 +22,8 @@ def get_polygons_controller(entity):
     return response
 
 
-@app.route("/api/lands/get_polygons")  # type: ignore
-@cross_origin()
-def get_polygons_by_bbox_controller():
+@app.route("/api/<string:entity>/get_polygons")  # type: ignore
+def get_polygons_by_bbox_controller(entity):
     try:
         x1, y1 = float(request.args.get("lat1")), float(request.args.get("lon1"))
         x2, y2 = float(request.args.get("lat2")), float(request.args.get("lon2"))
@@ -33,11 +32,10 @@ def get_polygons_by_bbox_controller():
     except (KeyError, ValueError):
         flask.abort(400, "Invalid bbox")
 
-    selected_lands = services.lands.select_all_in_bbox(Bbox(x1, y1, x2, y2))
+    selected_lands = services.lands.select_all_in_bbox(Bbox(x1, y1, x2, y2), entity)
 
-    response = {
-        "lands": services.polygons.serialize_polygons(selected_lands)
-    }
+    response = {}
+    response[entity] = services.polygons.serialize_polygons(selected_lands)
     return flask.jsonify(response)
 
 
