@@ -354,7 +354,7 @@ def check_if_land_is_sanitary_protected_zone(land_multipolygon: shapely.geometry
 
     if spz_multipolygon is None:
         all_polygons = []
-        for spz in db.session(SanitaryProtectedZone).all():
+        for spz in db.session.qu(SanitaryProtectedZone).all():
             spz_polygons = split_multipoint_by_parts(geoalchemy2.shape.to_shape(spz.points).geoms,
                                                      spz.parts)
             all_polygons.extend(spz_polygons)
