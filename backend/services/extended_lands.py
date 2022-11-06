@@ -70,7 +70,6 @@ def get_land_data(land: Optional[Land]) -> dict:
         }
     return data
 
-
 def get_start_ground_data(start_ground: Optional[StartGround]) -> dict:
     data = {
         'cadnum': None,
