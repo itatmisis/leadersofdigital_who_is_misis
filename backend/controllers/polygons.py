@@ -26,8 +26,8 @@ def get_polygons_controller(entity):
 @cross_origin()
 def get_polygons_by_bbox_controller():
     try:
-        x1, y1 = request.args.get("lat1"), request.args.get("lon1")
-        x2, y2 = request.args.get("lat2"), request.args.get("lon2")
+        x1, y1 = float(request.args.get("lat1")), float(request.args.get("lon1"))
+        x2, y2 = float(request.args.get("lat2")), float(request.args.get("lon2"))
         if x1 > x2 or y1 > y2:
             raise ValueError
     except (KeyError, ValueError):
