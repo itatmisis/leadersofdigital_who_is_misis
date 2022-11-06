@@ -1,0 +1,17 @@
+{
+  "default_properties": [
+    {
+      "entity_name": "land",
+      "entity_description": "ЗУ (Земельный участок)",
+      "properties": [
+        {
+          "property_name": "cadnum",
+          "property_description": "Кадастровый номер"
+        }
+      ]
+    }
+  ],
+  "extensions": {
+
+  }
+}

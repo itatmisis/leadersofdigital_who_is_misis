@@ -12,3 +12,10 @@ psql: CREATE EXTENSION postgis;
 ```
 DB_URL="postgresql://<username>:<password>>@<host>:<port>/<db-name>"
 ```
+
+`properties_config.json` содержит формализованное описание свойств некоторых сущностей, которые можно получить по /api/get_property
+```json
+{
+  "Здесь будет формат файла.....": "скоро"
+}
+```

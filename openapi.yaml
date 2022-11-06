@@ -1,0 +1,289 @@
+openapi: 3.0.3
+info:
+  title: API
+  description: |-
+    Бэкенд приложения для хакатона "Лидеры цифровой трансформации 2022"
+  version: 1.0.0
+externalDocs:
+  description: Исходный код
+  url: https://github.com/itatmisis/leadersofdigital_who_is_misis
+servers:
+  - url: http://89.108.102.188:5000/api
+  - url: http://localhost:8000/api
+tags:
+  - name: lands
+    description: Земельные участки (ЗУ)
+  - name: capital_construction_works
+    description: Объекты капитального строительства (ОКС)
+  - name: organizations
+    description: Организации
+  - name: cultural_heritage
+    description: Объекты культурного наследия
+  - name: sanitary_protected_zones
+    description: Сантиарно-защитные зоны
+  - name: start_grounds
+    description: Стартовые площадки
+paths:
+  /lands:
+    post:
+      tags:
+        - lands
+      summary: Границы земельных участков
+      description: Получить границы участков, входящих в заданную область
+      operationId: landsGetByBbox
+      requestBody:
+        description: Bbox (Boundary box) - запрашивеамая область
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                bbox:
+                  $ref: "#/components/schemas/Bbox"
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    oid:
+                      type: integer
+                    polygons:
+                      type: array
+                      items:
+                        $ref: "#/components/schemas/Polygon"
+
+        '400':
+          description: Invalid bbox
+  /lands/polygons:
+    get:
+      tags:
+        - lands
+      summary: Границы ЗУ
+      description: Границы всех земельных участков
+      operationId: landsGetPolygons
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  lands:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        oid:
+                          type: integer
+                        polygons:
+                          type: array
+                          items:
+                            $ref: "#/components/schemas/Polygon"
+  /lands/{oid}:
+    get:
+      tags:
+        - lands
+      summary: ЗУ по oid
+      description: Получить информацию о земельном участке по oid
+      operationId: landsGetByOid
+      parameters:
+        - name: oid
+          in: path
+          description: oid of land
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  land:
+                    type: object
+                    properties:
+                      oid:
+                        type: integer
+                      cadnum:
+                        type: string
+                      address:
+                        type: string
+                      has_effect:
+                        type: boolean
+                      property_t:
+                        type: integer
+                      shape_area:
+                        type: number
+                        format: double
+        "404":
+          description: Land with oid {oid} not found
+
+  /organizations/points:
+    get:
+      tags:
+        - organizations
+      summary: Местоположение организаций
+      description: Получить местоположение всех орагнизаций
+      operationId: organizationsGetPoints
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  organizations:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        oid:
+                          type: integer
+                        point:
+                          $ref: "#/components/schemas/Point"
+
+
+  /capital_construction_works/polygons:
+    get:
+      tags:
+        - capital_construction_works
+      summary: Границы ОКС
+      description: Границы всех объектов капитального строительства
+      operationId: capital_construction_worksGetPolygon
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  capital_construction_works:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        oid:
+                          type: integer
+                        polygons:
+                          type: array
+                          items:
+                            $ref: "#/components/schemas/Polygon"
+  /cultural_heritage/polygons:
+    get:
+      tags:
+        - cultural_heritage
+      summary: Границы объектов культурного наследия
+      description: Границы всех объектов культурного наследия
+      operationId: cultural_heritageGetPolygon
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cultural_heritage:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        oid:
+                          type: integer
+                        polygons:
+                          type: array
+                          items:
+                            $ref: "#/components/schemas/Polygon"
+  /sanitary_protected_zones/polygons:
+    get:
+      tags:
+        - sanitary_protected_zones
+      summary: Границы санитарно-защитных зон
+      description: Границы всех санитарно-защитных зон
+      operationId: sanitary_protected_zonesGetPolygon
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sanitary_protected_zones:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        oid:
+                          type: integer
+                        polygons:
+                          type: array
+                          items:
+                            $ref: "#/components/schemas/Polygon"
+  /start_grounds/polygons:
+    get:
+      tags:
+        - start_grounds
+      summary: Границы стартовых площадок
+      description: Границы всех стартовых площадок
+      operationId: start_groundsGetPolygon
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  start_grounds:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        oid:
+                          type: integer
+                        polygons:
+                          type: array
+                          items:
+                            $ref: "#/components/schemas/Polygon"
+
+
+      
+
+components:
+  schemas:
+    Bbox:
+      type: object
+      properties:
+        bottom_left:
+          $ref: "#/components/schemas/Point"
+        top_right:
+          $ref: "#/components/schemas/Point"
+
+    Polygon:
+      type: array
+      items:
+        $ref: "#/components/schemas/Point"
+
+    Point:
+      type: object
+      properties:
+          lat:
+            type: number
+            format: double
+            example: 55.751244
+          lon:
+            type: number
+            format: double
+            example: 37.618423

@@ -1,17 +1,10 @@
-import shapefile
-from sqlalchemy import Column, Integer, String, Enum, DECIMAL
-from sqlalchemy.dialects.postgresql import ARRAY
-from geoalchemy2 import Geometry
+from sqlalchemy import Column, String
 
 from backend import db
+from backend.data.models.base_polygonal_model import BasePolygonalModel
 
 
-class SanitaryProtectedZone(db.Model):
-    __tablename__ = "sanitary_protected_zones"  # СЗЗ (Санитарно-защитная зона)
-
-    oid = Column(Integer, primary_key=True)
-    parts = Column(ARRAY(Integer))
-    points = Column(Geometry(geometry_type="MULTIPOINT"))
-    bbox = Column(Geometry(geometry_type="POLYGON"))
+class SanitaryProtectedZone(db.Model, BasePolygonalModel):
+    __tablename__ = "sanitary_protected_zones"
 
     zone_type = Column(String(255))
