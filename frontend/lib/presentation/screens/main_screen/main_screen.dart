@@ -44,7 +44,7 @@ class _MainScreenState extends State<MainScreen> {
                         currentRightPage: currentRightPage,
                         onRightMenuPressed: (c) {
                           setState(
-                            () {
+                                () {
                               if (currentRightPage == c) {
                                 currentRightPage = null;
                               } else {
