@@ -6,7 +6,7 @@ import openpyxl
 import shapefile
 import shapely.geometry
 from alive_progress import alive_bar
-from shapely import geometry, wkt
+from shapely import geometry, wkt, wkb
 
 from backend import db, app
 from backend.data.models import *
@@ -82,7 +82,9 @@ def load_lands(path_to_dataset):  # ЗУ
     reader = shapefile.Reader(os.path.join(path_to_dataset, DATASET_PATHS["lands"]), encoding="cp1251")
     with alive_bar(len(reader.shapeRecords())) as bar:
         for shaperec in reader.shapeRecords():
-            splited_multipoints = split_multipoint_by_parts(list(map(lambda x: shapely.geometry.Point(*x), convert_multipoint(shaperec.shape.points))), shaperec.shape.parts)
+            splited_multipoints = split_multipoint_by_parts(
+                list(map(lambda x: shapely.geometry.Point(*x), convert_multipoint(shaperec.shape.points))),
+                shaperec.shape.parts)
             obj = Land(
                 oid=shaperec.shape.oid,
                 parts=list(shaperec.shape.parts),
@@ -106,7 +108,9 @@ def load_capital(path_to_dataset):  # ОКС
     reader = shapefile.Reader(os.path.join(path_to_dataset, DATASET_PATHS["capital"]), encoding="cp1251")
     with alive_bar(len(reader.shapeRecords())) as bar:
         for shaperec in reader.shapeRecords():
-            splited_multipoints = split_multipoint_by_parts(list(map(lambda x: shapely.geometry.Point(*x), convert_multipoint(shaperec.shape.points))), shaperec.shape.parts)
+            splited_multipoints = split_multipoint_by_parts(
+                list(map(lambda x: shapely.geometry.Point(*x), convert_multipoint(shaperec.shape.points))),
+                shaperec.shape.parts)
 
             obj = CapitalConstructionWorks(
                 oid=shaperec.shape.oid,
@@ -149,7 +153,9 @@ def load_protected_zones(path_to_dataset):  # Санитарно-защитны�
     reader = shapefile.Reader(os.path.join(path_to_dataset, DATASET_PATHS["protected_zones"]), encoding="cp1251")
     with alive_bar(len(reader.shapeRecords())) as bar:
         for shaperec in reader.shapeRecords():
-            splited_multipoints = split_multipoint_by_parts(list(map(lambda x: shapely.geometry.Point(*x), convert_multipoint(shaperec.shape.points))), shaperec.shape.parts)
+            splited_multipoints = split_multipoint_by_parts(
+                list(map(lambda x: shapely.geometry.Point(*x), convert_multipoint(shaperec.shape.points))),
+                shaperec.shape.parts)
 
             obj = SanitaryProtectedZone(
                 oid=shaperec.shape.oid,
@@ -170,7 +176,9 @@ def load_start_grounds(path_to_dataset):  # Стартовые площадки
     reader = shapefile.Reader(os.path.join(path_to_dataset, DATASET_PATHS["start_grounds"]), encoding="cp1251")
     with alive_bar(len(reader.shapeRecords())) as bar:
         for shaperec in reader.shapeRecords():
-            splited_multipoints = split_multipoint_by_parts(list(map(lambda x: shapely.geometry.Point(*x), convert_multipoint(shaperec.shape.points))), shaperec.shape.parts)
+            splited_multipoints = split_multipoint_by_parts(
+                list(map(lambda x: shapely.geometry.Point(*x), convert_multipoint(shaperec.shape.points))),
+                shaperec.shape.parts)
 
             obj = StartGround(
                 oid=shaperec.shape.oid,
@@ -192,7 +200,9 @@ def load_cultural_inheritance(path_to_dataset):  # Территории объе
     reader = shapefile.Reader(os.path.join(path_to_dataset, DATASET_PATHS["cultural_inheritance"]), encoding="cp1251")
     with alive_bar(len(reader.shapeRecords())) as bar:
         for shaperec in reader.shapeRecords():
-            splited_multipoints = split_multipoint_by_parts(list(map(lambda x: shapely.geometry.Point(*x), convert_multipoint(shaperec.shape.points))), shaperec.shape.parts)
+            splited_multipoints = split_multipoint_by_parts(
+                list(map(lambda x: shapely.geometry.Point(*x), convert_multipoint(shaperec.shape.points))),
+                shaperec.shape.parts)
 
             obj = CulturalHeritage(
                 oid=shaperec.shape.oid,
@@ -255,42 +265,45 @@ def load_buildings(path_to_dataset):
 def load_extended_lands():
     db.session.execute(TRUNCATE_TABLE.format(ExtendedLand.__tablename__))
 
-    for land in db.session.query(Land).all():
-        obj = ExtendedLand(
-            land_oid=land.oid,
-            start_ground_oid=None,
+    all_lands = db.session.execute("select *, st_asewkt(points) as wktpoints from lands").all()
+    all_sgs = db.session.execute("select *, st_asewkt(points) as wktpoints from start_grounds").all()
 
-            is_sanitary_protected_zone=check_if_land_is_sanitary_protected_zone(land.points),
-            is_cultural_heritage=check_if_land_is_cultural_heritage(land.points),
-            land=land,
-            **get_bad_building_data(land),
+    with alive_bar(len(all_lands) + len(all_sgs)) as bar:
+        for land in all_lands:
+            obj = ExtendedLand(
+                land_oid=land.oid,
+                start_ground_oid=None,
 
-        )
-        db.session.add(obj)
-        db.session.commit()
-        load_extended_capital_construction_works(obj, land.points)
+                is_sanitary_protected_zone=check_if_land_is_sanitary_protected_zone(land.wktpoints),
+                is_cultural_heritage=check_if_land_is_cultural_heritage(land.wktpoints),
 
+                **get_bad_building_data(land),
 
-#         # capital_construction_works = db.session.query(CapitalConstructionWorks).select(.points=)
+            )
+            db.session.add(obj)
+            db.session.commit()
+            load_extended_capital_construction_works(obj, land.wktpoints)
+            bar()
 
-    for start_ground in db.session.query(StartGround).all():
-        obj = ExtendedLand(
-            land_oid=None,
-            start_ground_oid=start_ground.oid,
+        #         # capital_construction_works = db.session.query(CapitalConstructionWorks).select(.points=)
 
-            is_sanitary_protected_zone=check_if_land_is_sanitary_protected_zone(start_ground_multipolygon),
-            is_cultural_heritage=check_if_land_is_cultural_heritage(start_ground_multipolygon),
-            start_ground=start_ground,
+        for start_ground in all_sgs:
+            obj = ExtendedLand(
+                land_oid=None,
+                start_ground_oid=start_ground.oid,
 
-        )
-        db.session.add(obj)
-        db.session.commit()
-        load_extended_capital_construction_works(obj, start_ground_multipolygon)
+                is_sanitary_protected_zone=check_if_land_is_sanitary_protected_zone(start_ground.wktpoints),
+                is_cultural_heritage=check_if_land_is_cultural_heritage(start_ground.wktpoints),
 
+            )
+            db.session.add(obj)
+            db.session.commit()
+            load_extended_capital_construction_works(obj, start_ground.wktpoints)
+            bar()
 
 
 def get_bad_building_data(land: Land) -> dict:
-    bad_building = BadBuilding.query.filter_by(cadnum=land.cadnum).get()
+    bad_building = db.session.query(BadBuilding).get(land.cadnum)
     bad_building_data = {
         'is_unauthorized': None,
         'is_hazardous': None,
@@ -308,73 +321,68 @@ def get_bad_building_data(land: Land) -> dict:
     return bad_building_data
 
 
-def load_extended_capital_construction_works(extended_land, land_multipolygon):
-    pass
-    # TODO: do sql query using postgis function
-    # for oks in db.session(CapitalConstructionWorks).all():
-    #     oks_multipolygon = shapely.geometry.MultiPolygon(split_multipoint_by_parts(geoalchemy2.shape.to_shape(oks.points).geoms,
-    #                                                  oks.parts))
-    #     if land_multipolygon.intersects(oks_multipolygon):
-    #         obj = ExtendedCapitalConstructionWorks(
-    #             oid=oks.oid,
-    #             habitable=oks.habitable,
-    #             area=oks.area,
-    #             year_built=oks.year_built,
-    #             wall_material=oks.wall_material,
-    #             hazardous=oks.hazardous,
-    #             typical=oks.typical,
-    #             extended_land_id=extended_land.id,
-    #         )
-    #         db.session.add(obj)
-    #         db.session.commit()
+def load_extended_capital_construction_works(extended_land, land_wktpoints: str):
+    db.session.execute(TRUNCATE_TABLE.format(ExtendedCapitalConstructionWorks.__tablename__))
+
+    for oks in db.session.execute(f"select *, st_asewkt(points) as wktpoints from capital_construction_works "
+                                  f"where st_intersects(points, ST_makeValid('{land_wktpoints}'));").all():
+        obj = ExtendedCapitalConstructionWorks(
+            oid=oks.oid,
+
+            **get_building_data(oks),
+
+            extended_land_id=extended_land.id,
+        )
+        db.session.add(obj)
+        db.session.commit()
+        load_extended_organizations(obj, oks.wktpoints)
 
 
-# def load_extended_organizations(extended_oks, oks_multipolygon):
-#     for org in db.session(ExtendedOrganization).all():
-#         geoalchemy2.functions.ST_Contains()
-#         # if land_multipolygon.intersects(oks_multipolygon):
-#         #     obj = ExtendedCapitalConstructionWorks(
-#         #         oid=oks.oid,
-#         #         habitable=oks.habitable,
-#         #         area=oks.area,
-#         #         year_built=oks.year_built,
-#         #         wall_material=oks.wall_material,
-#         #         hazardous=oks.hazardous,
-#         #         typical=oks.typical,
-#         #         extended_land_id=extended_land.id,
-#         #     )
-#             # db.session.add(obj)
-#             # db.session.commit()
+def get_building_data(oks: CapitalConstructionWorks) -> dict:
+    building = Building.query.get(oks.cadnum)
+    building_data = {
+        'habitable': None,
+        'area': None,
+        'year_built': None,
+        'wall_material': None,
+        'hazardous': None,
+        'typical': None,
+    }
 
-spz_multipolygon = None
+    if building is None:
+        return building_data
 
-
-def check_if_land_is_sanitary_protected_zone(land_multipolygon: shapely.geometry.MultiPolygon) -> bool:
-    global spz_multipolygon
-
-    if spz_multipolygon is None:
-        all_polygons = []
-        for spz in db.session.qu(SanitaryProtectedZone).all():
-            spz_polygons = split_multipoint_by_parts(geoalchemy2.shape.to_shape(spz.points).geoms,
-                                                     spz.parts)
-            all_polygons.extend(spz_polygons)
-        spz_multipolygon = shapely.geometry.MultiPolygon(all_polygons)
-
-    return spz_multipolygon.intersects(land_multipolygon)
+    building_data = {
+        'habitable': building.habitable,
+        'area': building.area,
+        'year_built': building.year_built,
+        'wall_material': building.wall_material,
+        'hazardous': building.hazardous,
+        'typical': building.typical,
+    }
+    return building_data
 
 
-cul_multipolygon = None
+def load_extended_organizations(extended_oks, oks_wktpoints):
+    db.session.execute(TRUNCATE_TABLE.format(ExtendedOrganization.__tablename__))
+
+    for org in db.session.execute(f"select * from organizations "
+                                  f"where st_contains(ST_makeValid(point), ST_makeValid('{oks_wktpoints}'));").all():
+        obj = ExtendedOrganization(
+            oid=org.oid,
+            extended_capital_construction_works_oid=extended_oks.oid
+        )
+        db.session.add(obj)
+        db.session.commit()
 
 
-def check_if_land_is_cultural_heritage(land_multipolygon: shapely.geometry.MultiPolygon) -> bool:
-    global cul_multipolygon
+def check_if_land_is_sanitary_protected_zone(land_wktpoints: str) -> bool:
+    zones_intersected = db.session.execute(f"select oid from sanitary_protected_zones where "
+                                           f"st_intersects(ST_makeValid(points), ST_makeValid('{land_wktpoints}'));").all()
+    return len(zones_intersected) > 0
 
-    if cul_multipolygon is None:
-        all_polygons = []
-        for cul in db.session(CulturalHeritage).all():
-            cul_polygons = split_multipoint_by_parts(geoalchemy2.shape.to_shape(cul.points).geoms,
-                                                     cul.parts)
-            all_polygons.extend(cul_polygons)
-        cul_multipolygon = shapely.geometry.MultiPolygon(all_polygons)
 
-    return cul_multipolygon.intersects(land_multipolygon)
+def check_if_land_is_cultural_heritage(land_wktpoints: str) -> bool:
+    zones_intersected = db.session.execute(f"select oid from cultural_heritage where "
+                                           f"st_intersects(ST_makeValid(points), ST_makeValid('{land_wktpoints}'));").all()
+    return len(zones_intersected) > 0

@@ -16,7 +16,8 @@ def load_dataset(dataset_path):
         dataset_to_db_convert.main(dataset_path, progress_output_stream=sys.stdout)
         print("Dataset loaded successfully")
     except Exception as e:
-        print(traceback.format_exc())
+        print(e)
+
 
 @db_cli.command("compare")
 @click.option("--table1", type=click.STRING)
@@ -26,5 +27,11 @@ def compare(table1, table2, column):
     res = compare_excel.compare_tables(table1, table2, *column)
     print('MATCHES: {}'.format(len(res.mappings().all())))
     # print(res)
+
+
+@db_cli.command("load-extended")
+def load_extended():
+    dataset_to_db_convert.load_extended_lands()
+
 
 app.cli.add_command(db_cli)
