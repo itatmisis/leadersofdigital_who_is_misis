@@ -7,7 +7,6 @@ class TabButton extends StatelessWidget {
   final String icon, text;
   final void Function()? onPressed;
   final bool isActive;
-
   final double iconSize;
   final double topPadding;
 

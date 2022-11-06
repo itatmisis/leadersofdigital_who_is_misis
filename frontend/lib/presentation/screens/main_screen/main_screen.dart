@@ -7,7 +7,7 @@ import 'package:frontend/presentation/screens/main_screen/bloc/sidebar_cubit.dar
 import 'package:frontend/presentation/screens/main_screen/layers_bar/layers_bar.dart';
 import 'package:frontend/presentation/screens/main_screen/widgets/loader.dart';
 import 'package:frontend/presentation/screens/main_screen/map/map_widget.dart';
-import 'package:frontend/presentation/screens/main_screen/topbar/topbar.dart';
+import 'package:frontend/presentation/screens/main_screen/topbars/topbar.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 
 import 'sidebar/side_bar.dart';
