@@ -4,6 +4,7 @@ import shapely.geometry
 from backend import app
 from backend import services
 from backend.services import polygons, lands
+from backend.tools.bbox import Bbox
 
 
 @app.route("/api/<string:entity>/polygons")
@@ -31,7 +32,7 @@ def get_polygons_by_bbox_controller():
     except (KeyError, ValueError):
         flask.abort(400, "Invalid bbox")
 
-    selected_lands = services.lands.select_all_in_bbox(shapely.geometry.box(x1, y1, x2, y2))
+    selected_lands = services.lands.select_all_in_bbox(Bbox(x1, y1, x2, y2))
 
     response = {
         "lands": services.polygons.serialize_polygons(selected_lands)
