@@ -7,7 +7,6 @@ class TabButton extends StatelessWidget {
   final String icon, text;
   final void Function()? onPressed;
   final bool isActive;
-
   final double iconSize;
   final double topPadding;
 
@@ -16,7 +15,7 @@ class TabButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
-      duration: Duration(milliseconds: 200),
+      duration: const Duration(milliseconds: 200),
       color: isActive? AppColors.white : Colors.transparent,
       child: TextButton(
         onPressed: onPressed,

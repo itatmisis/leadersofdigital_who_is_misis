@@ -3,7 +3,6 @@ import 'package:frontend/presentation/screens/main_screen/layers_bar/widgets/lis
 import 'package:frontend/presentation/theme/app_colors.dart';
 
 class LayersBar extends StatefulWidget {
-
   void Function(List<bool>)? onChanged;
 
   LayersBar({Key? key, this.onChanged}) : super(key: key);
@@ -13,7 +12,6 @@ class LayersBar extends StatefulWidget {
 }
 
 class _LayersBarState extends State<LayersBar> {
-
   final List<String> layers = [
     "Земельные участки",
     "Объект капитального строительства",
@@ -21,13 +19,18 @@ class _LayersBarState extends State<LayersBar> {
     "Санитарно-защитные зоны",
     "Стартовые площадки"
   ];
+  final List<Color> colors = [
+    AppColors.dewberry900,
+    AppColors.eggshellBlue400,
+    AppColors.black,
+    AppColors.lightGray,
+    AppColors.gray
+  ];
 
   List<bool> active = List.generate(5, (index) => true);
 
-
   @override
   Widget build(BuildContext context) {
-
     return Material(
       elevation: 10,
       child: Container(
@@ -41,68 +44,69 @@ class _LayersBarState extends State<LayersBar> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  GestureDetector(
-                    child: Column(
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            color: AppColors.veryPeri400,
-                          ),
-                          height: 100,
-                          width: 100,
+                  Column(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          color: AppColors.veryPeri400,
                         ),
-                        Text("Схема"),
-                      ],
-                    ),
+                        height: 100,
+                        width: 100,
+                        child: Image.asset("assets/images/scheme.png"),
+                      ),
+                      Text("Схема"),
+                    ],
                   ),
-                  GestureDetector(
-                    child: Column(
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            color: AppColors.veryPeri400,
-                          ),
-                          height: 100,
-                          width: 100,
+                  Column(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                        Text("Ортофотоплан"),
-                      ],
-                    ),
+                        height: 100,
+                        width: 100,
+                        child: Image.asset("assets/images/ortho.png"),
+                      ),
+                      Text("Ортофотоплан"),
+                    ],
                   ),
-                  GestureDetector(
-                    child: Column(
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            color: AppColors.veryPeri400,
-                          ),
-                          height: 100,
-                          width: 100,
+                  Column(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                        const Text("Топография"),
-                      ],
-                    ),
+                        height: 100,
+                        width: 100,
+                        child: Image.asset("assets/images/topography.png"),
+                      ),
+                      const Text("Топография"),
+                    ],
                   ),
                 ],
               ),
               const SizedBox(
                 height: 24,
               ),
+              Divider(),
               ListView.builder(
                 shrinkWrap: true,
                 itemBuilder: (context, index) {
-                  return ListViewElement(index: index, layers: layers, isChecked: active[index], onPressed: (b) {
-                    setState(() {
-                      active[index] = !active[index];
+                  return ListViewElement(
+                    color: colors[index],
+                      index: index,
+                      layers: layers,
+                      isChecked: active[index],
+                      onPressed: (b) {
+                        setState(() {
+                          active[index] = !active[index];
 
-                      if (widget.onChanged != null) {
-                        widget.onChanged!(active);
-                      }
-                    });
-                  });
+                          if (widget.onChanged != null) {
+                            widget.onChanged!(active);
+                          }
+                        });
+                      });
                 },
                 itemCount: layers.length,
               ),

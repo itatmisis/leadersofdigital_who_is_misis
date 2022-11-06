@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:math';
-import 'dart:developer' as dev ;
+import 'dart:developer' as dev;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/data/storage/storage.dart';
@@ -14,7 +14,7 @@ import 'package:frontend/presentation/screens/main_screen/map/map_modes/map_cubi
 import 'package:frontend/presentation/screens/main_screen/map/map_modes/map_interface.dart';
 import 'package:frontend/presentation/screens/main_screen/map/map_modes/zoom_bbox_cubit.dart';
 import 'package:frontend/presentation/screens/main_screen/map/plus_minus.dart';
-import 'package:frontend/presentation/screens/main_screen/widgets/short_menu.dart';
+import 'package:frontend/presentation/screens/main_screen/widgets/context_menu.dart';
 import 'package:frontend/presentation/theme/app_colors.dart';
 import 'package:frontend/presentation/widgets/small_button.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
@@ -26,13 +26,16 @@ class FillOptionContainer {
   const FillOptionContainer(this.fillOptions);
 
   @override
-
-  bool operator==(Object o) {
-    if (o is FillOptions && o.fillColor == fillOptions.fillColor && fillOptions.geometry == o.geometry) {
+  bool operator ==(Object o) {
+    if (o is FillOptions &&
+        o.fillColor == fillOptions.fillColor &&
+        fillOptions.geometry == o.geometry) {
       return true;
     }
 
-    if (o is FillOptionContainer && o.fillOptions.fillColor == fillOptions.fillColor && fillOptions.geometry == o.fillOptions.geometry) {
+    if (o is FillOptionContainer &&
+        o.fillOptions.fillColor == fillOptions.fillColor &&
+        fillOptions.geometry == o.fillOptions.geometry) {
       return true;
     }
 
@@ -65,7 +68,7 @@ class _MapWidgetState extends State<MapWidget> {
   @override
   void initState() {
     super.initState();
-
+    
     context.read<DrawCubit>().stream.listen((event) {
 
       if (event.layers.length == 1 && event.layers[0] is UpdateFillLayerModel) {
@@ -147,9 +150,9 @@ class _MapWidgetState extends State<MapWidget> {
     List<CircleOptions> f = [];
     for (var element in event.values) {
       f.add(CircleOptions(
-        circleRadius: 2,
-        circleColor: AppColors.black.toHexTriplet(),
-        geometry: element.location));
+          circleRadius: 2,
+          circleColor: AppColors.black.toHexTriplet(),
+          geometry: element.location));
     }
     controller!.addCircles(f);
   }
@@ -168,7 +171,7 @@ class _MapWidgetState extends State<MapWidget> {
             top: click.y,
             left: click.x,
             child: PointerInterceptor(
-              child: ShortMenu(),
+              child: ContextMenu(cnt: context),
             )));
 
     overlayState.insert(shortMenu!);
