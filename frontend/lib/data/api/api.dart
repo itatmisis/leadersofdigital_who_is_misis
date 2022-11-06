@@ -9,6 +9,7 @@ import 'package:frontend/domain/models/land_model.dart';
 import 'package:frontend/domain/models/organization_model.dart';
 import 'package:frontend/domain/models/sanitary_model.dart';
 import 'package:frontend/domain/models/start_model.dart';
+import 'package:mapbox_gl/mapbox_gl.dart';
 
 import '../../domain/models/capital_model.dart';
 
@@ -28,9 +29,17 @@ class Api {
     _client = dio;
   }
 
-  Future<Map<int, LandModel>> getLands() async {
+  Future<Map<int, LandModel>> getLands({LatLng? lb, LatLng? rt}) async {
     List<LandModel> res = [];
-    final response = await _client.get(ApiRoutes.getLands);
+
+    var response;
+    if (lb != null && rt != null) {
+      print(jsonEncode({'bbox' : {'bottom_left': {'lat': lb.latitude, 'lon': lb.longitude}, 'top_right': {'lat': rt.latitude, 'lon': rt.longitude}}}));
+      response = await _client.post(ApiRoutes.lands, data: jsonEncode({'bbox' : {'bottom_left': {'lat': lb.latitude, 'lon': lb.latitude}, 'top_right': {'lat': rt.latitude, 'lon': rt.latitude}}}));
+      print(response);
+    } else {
+      response = await _client.get(ApiRoutes.getLands);
+    }
 
     Map<int, LandModel> m = {};
 

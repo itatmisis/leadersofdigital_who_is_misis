@@ -7,21 +7,18 @@ import 'package:frontend/data/storage/storage.dart';
 import 'package:frontend/domain/models/area_model.dart';
 import 'package:frontend/domain/models/capital_model.dart';
 import 'package:frontend/domain/models/dot_model.dart';
-import 'package:frontend/domain/models/land_model.dart';
-import 'package:frontend/domain/models/sanitary_model.dart';
-import 'package:frontend/domain/models/start_model.dart';
-import 'package:frontend/presentation/screens/main_screen/bloc/layers_cubit.dart';
-import 'package:frontend/presentation/screens/main_screen/bloc/polygon_loader_cubit.dart';
 import 'package:frontend/presentation/screens/main_screen/bloc/sidebar_cubit.dart';
-import 'package:frontend/presentation/screens/main_screen/map/controller_extensions/on_click_handler.dart';
+import 'package:frontend/presentation/screens/main_screen/map/map_modes/draw_cubit.dart';
+import 'package:frontend/presentation/screens/main_screen/map/map_modes/layers_state.dart';
+import 'package:frontend/presentation/screens/main_screen/map/map_modes/map_cubit.dart';
+import 'package:frontend/presentation/screens/main_screen/map/map_modes/map_interface.dart';
+import 'package:frontend/presentation/screens/main_screen/map/map_modes/zoom_bbox_cubit.dart';
 import 'package:frontend/presentation/screens/main_screen/map/plus_minus.dart';
 import 'package:frontend/presentation/screens/main_screen/widgets/short_menu.dart';
 import 'package:frontend/presentation/theme/app_colors.dart';
 import 'package:frontend/presentation/widgets/small_button.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
-
-extension Hasher on FillOptions {}
 
 class FillOptionContainer {
   final FillOptions fillOptions;
@@ -68,58 +65,42 @@ class _MapWidgetState extends State<MapWidget> {
   @override
   void initState() {
     super.initState();
-    context.read<PolygonLoaderCubit>().stream.listen((event) {
-      if (controller != null) {
-        if (event == DownloadedState.downloaded) {
-          putLayerOnMap<LandModel>(Storage().lands, AppColors.dewberry400,
-              AppColors.dewberry900, 0.3);
-          putLayerOnMap<CapitalModel>(Storage().capitals,
-              AppColors.eggshellBlue400, AppColors.eggshellBlue900, 1);
-          putLayerOnMap<SanitaryModel>(
-              Storage().sanitaries, AppColors.lightGray, AppColors.gray, 0.3);
-          putLayerOnMap<StartModel>(
-              Storage().starts, AppColors.lightGray, AppColors.gray, 0.3);
-          putCirleLayerOnMap(Storage().organizations);
-          dev.log('PUT CIRCLES SUCCESS!!!!!');
+
+    context.read<DrawCubit>().stream.listen((event) {
+
+      if (event.layers.length == 1 && event.layers[0] is UpdateFillLayerModel) {
+        print('sdsdsd');
+        UpdateFillLayerModel l = (event.layers[0] as UpdateFillLayerModel);
+        controller!.updateFill(l.fill, FillOptions(fillColor: l.fillColor.toHexTriplet(), fillOutlineColor: l.outlineColor.toHexTriplet(),fillOpacity: l.opacity));
+        return;
+      }
+
+      controller!.clearCircles();
+      controller!.clearFills();
+
+      for (LayerModel ev in event.layers) {
+        if (ev is FillLayerModel) {
+          putFillLayerOnMap(ev.event, ev.fillColor,
+              ev.outlineColor, ev.onClick, ev.opacity);
+        }
+
+        if (ev is DotLayerModel) {
+          controller!.addCircle(CircleOptions(geometry: ev.geometry,
+              circleOpacity: ev.opacity,
+              circleColor: ev.fillColor.toHexTriplet(),
+              circleStrokeColor: ev.outlineColor.toHexTriplet()));
         }
       }
     });
 
-    context.read<LayersCubit>().stream.listen((event) {
+    context.read<ZoomBBoxCubit>().stream.listen((event) {
       if (controller != null) {
-        if (context.read<PolygonLoaderCubit>().downloaded ==
-            DownloadedState.downloaded) {
-          controller!.clearFills();
-          controller!.onFillTapped.clear();
-
-          if (event[0])
-            putLayerOnMap<LandModel>(Storage().lands, AppColors.dewberry400,
-                AppColors.dewberry900, 0.3);
-          if (event[2]) {
-            putCirleLayerOnMap(Storage().organizations);
-          }
-          if (event[3])
-            putLayerOnMap<CapitalModel>(Storage().capitals,
-                AppColors.eggshellBlue400, AppColors.eggshellBlue900, 1);
-          if (event[4])
-            putLayerOnMap<SanitaryModel>(
-                Storage().sanitaries, AppColors.lightGray, AppColors.gray, 0.3);
-          if (event[1])
-            putLayerOnMap<StartModel>(
-                Storage().starts, AppColors.lightGray, AppColors.gray, 0.3);
-        }
-      }
-    });
-
-
-    context.read<SidebarCubit>().stream.listen((event) {
-      if (controller! != null) {
-        if (event == null) {
-          OnClickHandler.close();
-        }
+        controller!.animateCamera(event.cameraPosition);
       }
     });
   }
+
+  void initAfterController() {}
 
   @override
   void dispose() {
@@ -137,8 +118,8 @@ class _MapWidgetState extends State<MapWidget> {
         CameraUpdate.zoomTo(controller!.cameraPosition!.zoom - 1));
   }
 
-  void putLayerOnMap<T>(
-      Map<int, AreaModel> event, Color fillColor, Color outlineColor,
+  void putFillLayerOnMap(
+      Map<int, AreaModel> event, Color fillColor, Color outlineColor, Function(AreaModel, Fill) onClick,
       [double? opacity]) async {
     Map<FillOptionContainer, AreaModel> mapPolygons = {};
 
@@ -157,26 +138,10 @@ class _MapWidgetState extends State<MapWidget> {
       FillOptionContainer c = FillOptionContainer(argument.options);
       if (mapPolygons.containsKey(c)) {
         await Timer(Duration(milliseconds: 100), () {});
-        onFillClick<T>(mapPolygons[c]!, argument, point!);
+        onClick(mapPolygons[c]!, argument);
       }
     });
   }
-
-
-  void onFillClick<T>(AreaModel model, Fill fill, Point<num> p) {
-    String? color = fill.options.fillColor;
-    OnClickHandler.choose(fill, onChoose: (f) {
-      if (OnClickHandler.isChosen) {
-        OnClickHandler.close();
-      }
-
-      controller!.updateFill(fill, fill.options.copyWith(FillOptions(fillColor: AppColors.veryPeri400.toHexTriplet())));
-      _showShortMenu(Point<double>(p.x.toDouble(), p.y.toDouble()));
-      context.read<SidebarCubit>().setCurrentArea(model);
-    }, onClose: (f) {
-      controller!.updateFill(f, fill.options.copyWith(FillOptions(fillColor: color)));
-      _hideShortMenu();
-    });
 
   void putCirleLayerOnMap(Map<int, DotModel> event) async {
     List<CircleOptions> f = [];
@@ -187,11 +152,7 @@ class _MapWidgetState extends State<MapWidget> {
         geometry: element.location));
     }
     controller!.addCircles(f);
-    dev.log("CIRCLES VOID SUCCESS");
   }
-
-
-
 
   Future<List<Fill>> drawFills(List<FillOptionContainer> fillOptions, Color fillColor, Color outlineColor, [double? opacity]) async {
     final List<FillOptions> f = List.generate(fillOptions.length, (index) => fillOptions[index].fillOptions);
@@ -210,7 +171,7 @@ class _MapWidgetState extends State<MapWidget> {
               child: ShortMenu(),
             )));
 
-    overlayState?.insert(shortMenu!);
+    overlayState.insert(shortMenu!);
   }
 
   void _hideShortMenu() {
@@ -221,37 +182,62 @@ class _MapWidgetState extends State<MapWidget> {
     }
   }
 
+  late Function(BuildContext) init, disposed;
+  late Function(BuildContext, {PointAndLatLng? point, Annotation? annotation}) onMapPressed;
+  late Function(BuildContext, CameraPosition) onCameraMove;
+
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        MapboxMap(
-          cameraTargetBounds: CameraTargetBounds(LatLngBounds(
-            northeast: const LatLng(56.28408249081925, 38.17401410295989),
-            southwest: const LatLng(55.37949118840644, 36.75537470776375),
-          )),
-          compassEnabled: false,
-          zoomGesturesEnabled: isShortMenuActive? false : true,
-          scrollGesturesEnabled: isShortMenuActive? false : true,
-          accessToken:
-              'pk.eyJ1IjoicGl0dXNhbm9uaW1vdXMiLCJhIjoiY2twcHk5M2VtMDZvZjJ2bzEzMHNhNDM1diJ9.8BLcJknh8FvUVLJRZbHJDQ',
-          styleString:
-              'mapbox://styles/pitusanonimous/ckpq0eydh0tk318mr0dcw773k',
-          initialCameraPosition: const CameraPosition(
-            zoom: 12.0,
-            target: LatLng(55.75110596550744, 37.609532416801954),
-          ),
-          onMapCreated: (MapboxMapController c) {
-            controller = c;
+        BlocBuilder<MapCubit, MapInterface>(
+            builder: (_, interf) {
+              init = interf.init;
+              disposed = interf.dispose;
+              onMapPressed = interf.onMapPressed;
+              onCameraMove = interf.onCameraMove;
 
-            controller!.onFeatureTapped.add((id, p, coordinates) {
-              point = p;
-            });
-          },
-          onMapClick: (p, l) {
-            _hideShortMenu();
-            context.read<SidebarCubit>().setCurrentArea(null);
-          },
+              if (controller != null) {
+                init(context);
+              }
+
+              return BlocBuilder<ZoomBBoxCubit, ZoomBBoxState>(
+                  builder: (_, st) => MapboxMap(
+                    cameraTargetBounds: CameraTargetBounds(LatLngBounds(
+                      northeast: st.rt,
+                      southwest: st.lb,
+                    )),
+                    compassEnabled: false,
+                    zoomGesturesEnabled: st.isScroll,
+                    scrollGesturesEnabled: st.isScroll,
+                    accessToken:
+                    'pk.eyJ1IjoicGl0dXNhbm9uaW1vdXMiLCJhIjoiY2twcHk5M2VtMDZvZjJ2bzEzMHNhNDM1diJ9.8BLcJknh8FvUVLJRZbHJDQ',
+                    styleString:
+                    'mapbox://styles/pitusanonimous/ckpq0eydh0tk318mr0dcw773k',
+                    initialCameraPosition: const CameraPosition(
+                      zoom: 12.0,
+                      target: LatLng(55.75110596550744, 37.609532416801954),
+                    ),
+                    onMapCreated: (MapboxMapController c) {
+                      controller = c;
+
+                      controller!.onFeatureTapped.add((id, p, coordinates) {
+                        point = p;
+                        onMapPressed(context, point: PointAndLatLng(p, coordinates));
+                      });
+
+                      init(context);
+                    },
+                    onMapClick: (p, l) {
+                      _hideShortMenu();
+                      onMapPressed(context, point: PointAndLatLng(p, l));
+                    },
+
+                    onCameraIdle: () =>
+                        onCameraMove(context, controller!.cameraPosition!),
+                  )
+              );
+            }
         ),
         Align(
           alignment: Alignment.centerRight,

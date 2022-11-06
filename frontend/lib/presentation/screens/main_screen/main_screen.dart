@@ -25,7 +25,6 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    context.read<PolygonLoaderCubit>().load();
     return Scaffold(
       body: Center(
           child: Stack(
