@@ -41,50 +41,47 @@ class _LayersBarState extends State<LayersBar> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  GestureDetector(
-                    child: Column(
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            color: AppColors.veryPeri400,
-                          ),
-                          height: 100,
-                          width: 100,
+                  Column(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          color: AppColors.veryPeri400,
                         ),
-                        Text("Схема"),
-                      ],
-                    ),
+                        height: 100,
+                        width: 100,
+                        child: Image.asset("assets/images/scheme.png"),
+                      ),
+                      Text("Схема"),
+                    ],
                   ),
-                  GestureDetector(
-                    child: Column(
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            color: AppColors.veryPeri400,
-                          ),
-                          height: 100,
-                          width: 100,
+                  Column(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+
                         ),
-                        Text("Ортофотоплан"),
-                      ],
-                    ),
+                        height: 100,
+                        width: 100,
+                        child: Image.asset("assets/images/ortho.png"),
+                      ),
+                      Text("Ортофотоплан"),
+                    ],
                   ),
-                  GestureDetector(
-                    child: Column(
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            color: AppColors.veryPeri400,
-                          ),
-                          height: 100,
-                          width: 100,
+                  Column(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+
                         ),
-                        const Text("Топография"),
-                      ],
-                    ),
+                        height: 100,
+                        width: 100,
+                        child: Image.asset("assets/images/topography.png"),
+                      ),
+                      const Text("Топография"),
+                    ],
                   ),
                 ],
               ),

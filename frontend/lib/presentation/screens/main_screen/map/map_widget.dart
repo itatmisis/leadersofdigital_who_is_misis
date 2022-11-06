@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:math';
-import 'dart:developer' as dev ;
+import 'dart:developer' as dev;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/data/storage/storage.dart';
@@ -15,7 +15,7 @@ import 'package:frontend/presentation/screens/main_screen/bloc/polygon_loader_cu
 import 'package:frontend/presentation/screens/main_screen/bloc/sidebar_cubit.dart';
 import 'package:frontend/presentation/screens/main_screen/map/controller_extensions/on_click_handler.dart';
 import 'package:frontend/presentation/screens/main_screen/map/plus_minus.dart';
-import 'package:frontend/presentation/screens/main_screen/widgets/short_menu.dart';
+import 'package:frontend/presentation/screens/main_screen/widgets/context_menu.dart';
 import 'package:frontend/presentation/theme/app_colors.dart';
 import 'package:frontend/presentation/widgets/small_button.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
@@ -29,13 +29,16 @@ class FillOptionContainer {
   const FillOptionContainer(this.fillOptions);
 
   @override
-
-  bool operator==(Object o) {
-    if (o is FillOptions && o.fillColor == fillOptions.fillColor && fillOptions.geometry == o.geometry) {
+  bool operator ==(Object o) {
+    if (o is FillOptions &&
+        o.fillColor == fillOptions.fillColor &&
+        fillOptions.geometry == o.geometry) {
       return true;
     }
 
-    if (o is FillOptionContainer && o.fillOptions.fillColor == fillOptions.fillColor && fillOptions.geometry == o.fillOptions.geometry) {
+    if (o is FillOptionContainer &&
+        o.fillOptions.fillColor == fillOptions.fillColor &&
+        fillOptions.geometry == o.fillOptions.geometry) {
       return true;
     }
 
@@ -80,7 +83,7 @@ class _MapWidgetState extends State<MapWidget> {
           putLayerOnMap<StartModel>(
               Storage().starts, AppColors.lightGray, AppColors.gray, 0.3);
           putCirleLayerOnMap(Storage().organizations);
-          dev.log('PUT CIRCLES SUCCESS!!!!!');
+
         }
       }
     });
@@ -110,7 +113,6 @@ class _MapWidgetState extends State<MapWidget> {
         }
       }
     });
-
 
     context.read<SidebarCubit>().stream.listen((event) {
       if (controller! != null) {
@@ -151,7 +153,7 @@ class _MapWidgetState extends State<MapWidget> {
     }
 
     List l =
-    await drawFills(mapPolygons.keys.toList(), fillColor, outlineColor);
+        await drawFills(mapPolygons.keys.toList(), fillColor, outlineColor);
 
     controller!.onFillTapped.add((argument) async {
       FillOptionContainer c = FillOptionContainer(argument.options);
@@ -162,7 +164,6 @@ class _MapWidgetState extends State<MapWidget> {
     });
   }
 
-
   void onFillClick<T>(AreaModel model, Fill fill, Point<num> p) {
     String? color = fill.options.fillColor;
     OnClickHandler.choose(fill, onChoose: (f) {
@@ -170,119 +171,121 @@ class _MapWidgetState extends State<MapWidget> {
         OnClickHandler.close();
       }
 
-      controller!.updateFill(fill, fill.options.copyWith(
-          FillOptions(fillColor: AppColors.veryPeri400.toHexTriplet())));
+      controller!.updateFill(
+          fill,
+          fill.options.copyWith(
+              FillOptions(fillColor: AppColors.veryPeri400.toHexTriplet())));
       _showShortMenu(Point<double>(p.x.toDouble(), p.y.toDouble()));
       context.read<SidebarCubit>().setCurrentArea(model);
     }, onClose: (f) {
-      controller!.updateFill(
-          f, fill.options.copyWith(FillOptions(fillColor: color)));
+      controller!
+          .updateFill(f, fill.options.copyWith(FillOptions(fillColor: color)));
       _hideShortMenu();
     });
   }
 
-    void putCirleLayerOnMap(Map<int, DotModel> event) async {
-      List<CircleOptions> f = [];
-      for (var element in event.values) {
-        f.add(CircleOptions(
-            circleRadius: 2,
-            circleColor: AppColors.black.toHexTriplet(),
-            geometry: element.location));
-      }
-      controller!.addCircles(f);
-      dev.log("CIRCLES VOID SUCCESS");
+  void putCirleLayerOnMap(Map<int, DotModel> event) async {
+    List<CircleOptions> f = [];
+    for (var element in event.values) {
+      f.add(CircleOptions(
+          circleRadius: 2,
+          circleColor: AppColors.black.toHexTriplet(),
+          geometry: element.location));
     }
+    controller!.addCircles(f);
 
+  }
 
+  Future<List<Fill>> drawFills(List<FillOptionContainer> fillOptions,
+      Color fillColor, Color outlineColor,
+      [double? opacity]) async {
+    final List<FillOptions> f = List.generate(
+        fillOptions.length, (index) => fillOptions[index].fillOptions);
+    return await controller!.addFills(f);
+  }
 
+  void _showShortMenu(Point<double> click) {
+    isShortMenuActive = true;
+    setState(() {});
+    OverlayState? overlayState = Overlay.of(context);
+    shortMenu = OverlayEntry(
+        builder: (_) => Positioned(
+            top: click.y,
+            left: click.x,
+            child: PointerInterceptor(
+              child: ContextMenu(cnt: context),
+            )));
 
-    Future<List<Fill>> drawFills(List<FillOptionContainer> fillOptions, Color fillColor, Color outlineColor, [double? opacity]) async {
-      final List<FillOptions> f = List.generate(fillOptions.length, (index) => fillOptions[index].fillOptions);
-      return await controller!.addFills(f);
-    }
+    overlayState?.insert(shortMenu!);
+  }
 
-    void _showShortMenu(Point<double> click) {
-      isShortMenuActive = true;
+  void _hideShortMenu() {
+    if (isShortMenuActive) {
+      isShortMenuActive = false;
       setState(() {});
-      OverlayState? overlayState = Overlay.of(context);
-      shortMenu = OverlayEntry(
-          builder: (_) => Positioned(
-              top: click.y,
-              left: click.x,
-              child: PointerInterceptor(
-                child: ShortMenu(),
-              )));
-
-      overlayState?.insert(shortMenu!);
-    }
-
-    void _hideShortMenu() {
-      if (isShortMenuActive) {
-        isShortMenuActive = false;
-        setState(() {});
-        shortMenu?.remove();
-      }
-    }
-
-    @override
-    Widget build(BuildContext context) {
-      return Stack(
-        children: [
-          MapboxMap(
-            cameraTargetBounds: CameraTargetBounds(LatLngBounds(
-              northeast: const LatLng(56.28408249081925, 38.17401410295989),
-              southwest: const LatLng(55.37949118840644, 36.75537470776375),
-            )),
-            compassEnabled: false,
-            zoomGesturesEnabled: isShortMenuActive? false : true,
-            scrollGesturesEnabled: isShortMenuActive? false : true,
-            accessToken:
-            'pk.eyJ1IjoicGl0dXNhbm9uaW1vdXMiLCJhIjoiY2twcHk5M2VtMDZvZjJ2bzEzMHNhNDM1diJ9.8BLcJknh8FvUVLJRZbHJDQ',
-            styleString:
-            'mapbox://styles/pitusanonimous/ckpq0eydh0tk318mr0dcw773k',
-            initialCameraPosition: const CameraPosition(
-              zoom: 12.0,
-              target: LatLng(55.75110596550744, 37.609532416801954),
-            ),
-            onMapCreated: (MapboxMapController c) {
-              controller = c;
-
-              controller!.onFeatureTapped.add((id, p, coordinates) {
-                point = p;
-              });
-            },
-            onMapClick: (p, l) {
-              _hideShortMenu();
-              context.read<SidebarCubit>().setCurrentArea(null);
-            },
-          ),
-          Align(
-            alignment: Alignment.centerRight,
-            child: Padding(
-              padding: const EdgeInsets.only(right: 10),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  PointerInterceptor(
-                    child: PlusMinusWidget(
-                        onPlus: onCameraZoomPlus, onMinus: onCameraZoomMinus),
-                  ),
-                  const SizedBox(
-                    height: 24,
-                  ),
-                  PointerInterceptor(
-                      child: SmallButton(
-                          icon: "assets/icons/straighten.svg",
-                          color: AppColors.neutral800,
-                          onPressed: () {})),
-                  const SizedBox(
-                    height: 24,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      );
+      shortMenu?.remove();
     }
   }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        MapboxMap(
+          cameraTargetBounds: CameraTargetBounds(LatLngBounds(
+            northeast: const LatLng(56.28408249081925, 38.17401410295989),
+            southwest: const LatLng(55.37949118840644, 36.75537470776375),
+          )),
+          compassEnabled: false,
+          zoomGesturesEnabled: isShortMenuActive ? false : true,
+          scrollGesturesEnabled: isShortMenuActive ? false : true,
+          accessToken:
+              'pk.eyJ1IjoicGl0dXNhbm9uaW1vdXMiLCJhIjoiY2twcHk5M2VtMDZvZjJ2bzEzMHNhNDM1diJ9.8BLcJknh8FvUVLJRZbHJDQ',
+          styleString:
+              'mapbox://styles/pitusanonimous/ckpq0eydh0tk318mr0dcw773k',
+          initialCameraPosition: const CameraPosition(
+            zoom: 12.0,
+            target: LatLng(55.75110596550744, 37.609532416801954),
+          ),
+          onMapCreated: (MapboxMapController c) {
+            controller = c;
+
+            controller!.onFeatureTapped.add((id, p, coordinates) {
+              point = p;
+            });
+          },
+          onMapClick: (p, l) {
+            _hideShortMenu();
+            context.read<SidebarCubit>().setCurrentArea(null);
+          },
+        ),
+        Align(
+          alignment: Alignment.centerRight,
+          child: Padding(
+            padding: const EdgeInsets.only(right: 10),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                PointerInterceptor(
+                  child: PlusMinusWidget(
+                      onPlus: onCameraZoomPlus, onMinus: onCameraZoomMinus),
+                ),
+                const SizedBox(
+                  height: 24,
+                ),
+                PointerInterceptor(
+                    child: SmallButton(
+                        icon: "assets/icons/straighten.svg",
+                        color: AppColors.neutral800,
+                        onPressed: () {})),
+                const SizedBox(
+                  height: 24,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}

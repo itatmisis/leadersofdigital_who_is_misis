@@ -6,6 +6,7 @@ import 'package:frontend/presentation/screens/main_screen/bloc/sidebar_cubit.dar
 import 'package:frontend/presentation/screens/main_screen/main_screen.dart';
 import 'package:frontend/presentation/screens/main_screen/topbars/cubit/top_bar_cubit.dart';
 import 'package:frontend/presentation/screens/main_screen/topbars/cubit/top_bar_state.dart';
+import 'package:frontend/presentation/screens/main_screen/widgets/cubit/context_menu_cubit.dart';
 import 'package:frontend/presentation/theme/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
@@ -44,6 +45,9 @@ class MyApp extends StatelessWidget {
                   isContinueEnabled: true,
                   isBeginEnabled: false),
             ),
+          ),
+          BlocProvider(
+            create: (_) => ContextMenuCubit(ContextMenuState.added),
           ),
         ],
         child: const MainScreen(),

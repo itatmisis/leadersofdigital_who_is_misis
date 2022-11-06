@@ -5,6 +5,8 @@ import 'package:frontend/domain/models/area_model.dart';
 import 'package:frontend/presentation/screens/main_screen/bloc/layers_cubit.dart';
 import 'package:frontend/presentation/screens/main_screen/bloc/polygon_loader_cubit.dart';
 import 'package:frontend/presentation/screens/main_screen/bloc/sidebar_cubit.dart';
+import 'package:frontend/presentation/screens/main_screen/configurator/configurator.dart';
+import 'package:frontend/presentation/screens/main_screen/export/export_bar.dart';
 import 'package:frontend/presentation/screens/main_screen/layers_bar/layers_bar.dart';
 import 'package:frontend/presentation/screens/main_screen/topbars/bbox_top_bar.dart';
 import 'package:frontend/presentation/screens/main_screen/topbars/choose_top_bar.dart';
@@ -44,7 +46,7 @@ class _MainScreenState extends State<MainScreen> {
                         currentRightPage: currentRightPage,
                         onRightMenuPressed: (c) {
                           setState(
-                                () {
+                            () {
                               if (currentRightPage == c) {
                                 currentRightPage = null;
                               } else {
@@ -55,13 +57,16 @@ class _MainScreenState extends State<MainScreen> {
                         },
                       );
                     } else if (state is ChooseTopBarState) {
-                      return ChooseTopBar(p1: state.p1,p2: state.p2,);
+                      return ChooseTopBar(
+                        p1: state.p1,
+                        p2: state.p2,
+                      );
                     } else {
                       return BboxTopBar(
                         currentRightPage: currentRightPage,
                         onRightMenuPressed: (c) {
                           setState(
-                                () {
+                            () {
                               if (currentRightPage == c) {
                                 currentRightPage = null;
                               } else {
@@ -101,6 +106,20 @@ class _MainScreenState extends State<MainScreen> {
                                   context.read<LayersCubit>().setLayers(l),
                             ),
                           ),
+                        ),
+                        AnimatedPositioned(
+                          top: 0,
+                          right: currentRightPage == 3 ? 0 : -450,
+                          height: c.maxHeight,
+                          duration: const Duration(milliseconds: 200),
+                          child: const ExportBar(),
+                        ),
+                        AnimatedPositioned(
+                          top: 0,
+                          right: currentRightPage == 1 ? 0 : -600,
+                          height: c.maxHeight,
+                          duration: const Duration(milliseconds: 200),
+                          child: const ConfiguratorBar(),
                         ),
                       ],
                     ),
