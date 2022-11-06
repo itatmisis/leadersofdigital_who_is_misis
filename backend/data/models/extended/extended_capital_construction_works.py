@@ -16,5 +16,5 @@ class ExtendedCapitalConstructionWorks(db.Model):
 
     extended_land_id = Column(Integer, ForeignKey("extended_lands.id", ondelete='CASCADE'))
 
-    extended_organizations = orm.relationship("ExtendedOrganization", backref="extended_capital_construction_works")
+    extended_organizations = orm.relationship("ExtendedOrganization")
     # extended_land = orm.relationship("ExtendedLand", foreign_keys=[extended_land_id])

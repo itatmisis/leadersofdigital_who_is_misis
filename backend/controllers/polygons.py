@@ -1,5 +1,6 @@
 import flask
 import shapely.geometry
+from flask_cors import cross_origin
 
 from backend import app
 from backend import services
@@ -21,6 +22,7 @@ def get_polygons_controller(entity):
 
 
 @app.route("/api/lands/get_polygons", methods=["POST"])  # type: ignore
+@cross_origin()
 def get_polygons_by_bbox_controller():
     json = flask.request.json
     bbox = json["bbox"]
