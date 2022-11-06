@@ -59,18 +59,18 @@ class LandsImpl implements MapInterface {
 
         LatLng lb = LatLng(last1!.latLng.latitude < last2!.latLng.latitude? last1!.latLng.latitude : last2!.latLng.latitude, last1!.latLng.longitude < last2!.latLng.longitude? last1!.latLng.longitude : last2!.latLng.longitude);
         LatLng rt = LatLng(last1!.latLng.latitude > last2!.latLng.latitude? last1!.latLng.latitude : last2!.latLng.latitude, last1!.latLng.longitude > last2!.latLng.longitude? last1!.latLng.longitude : last2!.latLng.longitude);
-        // context.read<PolygonLoaderCubit>().load(DownloadedState.inProgress);
-        // dispose(context);
-        // Storage().lands = await Api().getLands(lb: lb, rt: rt);
-        // context.read<DrawCubit>().layers.add(FillLayerModel(event: Storage().lands, fillColor: AppColors.dewberry400, onClick:  (_, fill) {
-        //   onMapPressed(context, annotation: fill);
-        // }, outlineColor: AppColors.dewberry900, opacity: 0.3));
-        // context.read<DrawCubit>().draw();
-        // context.read<PolygonLoaderCubit>().load(DownloadedState.downloaded);
-
-        context.read<ZoomBBoxCubit>().push(ZoomBBoxState(context.read<ZoomBBoxCubit>().state.cameraPosition,lb, rt, true));
+        context.read<PolygonLoaderCubit>().load(DownloadedState.inProgress);
         dispose(context);
-        context.read<MapCubit>().push(BBoxImpl());
+        Storage().lands = await Api().getLands(lb: lb, rt: rt);
+        context.read<DrawCubit>().layers.add(FillLayerModel(event: Storage().lands, fillColor: AppColors.dewberry400, onClick:  (_, fill) {
+          onMapPressed(context, annotation: fill);
+        }, outlineColor: AppColors.dewberry900, opacity: 0.3));
+        context.read<DrawCubit>().draw();
+        context.read<PolygonLoaderCubit>().load(DownloadedState.downloaded);
+
+        // context.read<ZoomBBoxCubit>().push(ZoomBBoxState(context.read<ZoomBBoxCubit>().state.cameraPosition,lb, rt, true));
+        // dispose(context);
+        // context.read<MapCubit>().push(BBoxImpl());
       }
 
     }
