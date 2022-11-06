@@ -1,5 +1,6 @@
 import flask
 import shapely.geometry
+from flask import request
 from flask_cors import cross_origin
 
 from backend import app
@@ -21,14 +22,12 @@ def get_polygons_controller(entity):
     return response
 
 
-@app.route("/api/lands/get_polygons", methods=["POST"])  # type: ignore
+@app.route("/api/lands/get_polygons")  # type: ignore
 @cross_origin()
 def get_polygons_by_bbox_controller():
-    json = flask.request.json
-    bbox = json["bbox"]
     try:
-        x1, y1 = bbox["bottom_left"]["lat"], bbox["bottom_left"]["lon"]
-        x2, y2 = bbox["top_right"]["lat"], bbox["top_right"]["lon"]
+        x1, y1 = request.args.get("lat1"), request.args.get("lon1")
+        x2, y2 = request.args.get("lat2"), request.args.get("lon2")
         if x1 > x2 or y1 > y2:
             raise ValueError
     except (KeyError, ValueError):

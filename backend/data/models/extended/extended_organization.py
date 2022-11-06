@@ -13,4 +13,5 @@ class ExtendedOrganization(db.Model):
                                                                          ondelete='CASCADE'), nullable=True)
 
     extended_capital_construction_works = orm.relationship("ExtendedCapitalConstructionWorks",
-                                                           foreign_keys=[extended_capital_construction_works_oid])
+                                                           foreign_keys=[extended_capital_construction_works_oid],
+                                                           overlaps="extended_organizations")
