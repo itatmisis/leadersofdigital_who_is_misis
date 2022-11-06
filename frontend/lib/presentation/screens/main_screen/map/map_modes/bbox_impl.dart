@@ -32,7 +32,7 @@ class BBoxImpl extends MapInterface {
   @override
   void onMapPressed(BuildContext context, {PointAndLatLng? point, Annotation? annotation}) {
     if (annotation != null) {
-      context.read<DrawCubit>().update(UpdateFillLayerModel(fill: annotation as Fill, fillColor: AppColors.veryPeri900, outlineColor: AppColors.veryPeri900, opacity: 1));
+      context.read<DrawCubit>().update(UpdateFillLayerModel(fill: annotation as Fill, fillColor: AppColors.veryPeri900, outlineColor: AppColors.veryPeri900, opacity: 0.7));
     }
   }
 

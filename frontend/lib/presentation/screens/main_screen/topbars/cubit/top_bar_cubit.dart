@@ -11,7 +11,7 @@ class TopBarCubit extends Cubit<TopBarState> {
 
   void paintChoseAfterFirstPoint(LatLng point) {
     emit(ChooseTopBarState(
-        p1: point, p2: null, isBeginEnabled: false, isContinueEnabled: true));
+        p1: point, p2: LatLng(1,1), isBeginEnabled: false, isContinueEnabled: true));
   }
 
   void paintChoseAfterSecondPoint(LatLng p1, LatLng p2) {

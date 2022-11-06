@@ -44,14 +44,10 @@ class MyApp extends StatelessWidget {
           ),
           BlocProvider(create: (_) => MapCubit(HeatMapImpl())),
           BlocProvider(create: (_) => DrawCubit(LayerState([]))),
-          BlocProvider(create: (_) => ZoomBBoxCubit(ZoomBBoxState(CameraUpdate.zoomTo(14), LatLng(55.37949118840644, 36.75537470776375), LatLng(56.28408249081925, 38.17401410295989), true)))
+          BlocProvider(create: (_) => ZoomBBoxCubit(ZoomBBoxState(CameraUpdate.zoomTo(14), LatLng(55.37949118840644, 36.75537470776375), LatLng(56.28408249081925, 38.17401410295989), true))),
           BlocProvider(
             create: (_) => TopBarCubit(
-              ChooseTopBarState(
-                  p1: LatLng(55.5, 37.5),
-                  p2: LatLng(55.57, 37.57),
-                  isContinueEnabled: true,
-                  isBeginEnabled: false),
+              MainTopBarState(),
             ),
           ),
           BlocProvider(
