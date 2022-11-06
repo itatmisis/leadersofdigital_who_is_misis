@@ -15,7 +15,7 @@ app = Flask(__name__)
 
 if os.environ.get("DEBUG") == "true":
     import flask_cors
-    cors = flask_cors.CORS(app)
+    cors = flask_cors.CORS(app, resources={r"/*": {"origins": "*"}})
 
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DB_URL")
 app.config.update(config.CONFIG)
