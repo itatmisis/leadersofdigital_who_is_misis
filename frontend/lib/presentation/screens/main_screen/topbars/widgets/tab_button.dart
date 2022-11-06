@@ -15,7 +15,7 @@ class TabButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
-      duration: Duration(milliseconds: 200),
+      duration: const Duration(milliseconds: 200),
       color: isActive? AppColors.white : Colors.transparent,
       child: TextButton(
         onPressed: onPressed,

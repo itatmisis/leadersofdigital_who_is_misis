@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:developer' as dev;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/domain/models/area_model.dart';
 import 'package:frontend/presentation/screens/main_screen/bloc/layers_cubit.dart';
@@ -8,7 +9,7 @@ import 'package:frontend/presentation/screens/main_screen/layers_bar/layers_bar.
 import 'package:frontend/presentation/screens/main_screen/topbars/bbox_top_bar.dart';
 import 'package:frontend/presentation/screens/main_screen/topbars/choose_top_bar.dart';
 import 'package:frontend/presentation/screens/main_screen/topbars/cubit/top_bar_cubit.dart';
-import 'package:frontend/presentation/screens/main_screen/topbars/top_bar_state.dart';
+import 'package:frontend/presentation/screens/main_screen/topbars/cubit/top_bar_state.dart';
 import 'package:frontend/presentation/screens/main_screen/widgets/loader.dart';
 import 'package:frontend/presentation/screens/main_screen/map/map_widget.dart';
 import 'package:frontend/presentation/screens/main_screen/topbars/topbar.dart';
@@ -36,28 +37,43 @@ class _MainScreenState extends State<MainScreen> {
             Column(
               children: [
                 BlocBuilder<TopBarCubit, TopBarState>(
-                    builder: (BuildContext context, TopBarState state) {
-                  if (state is MainTopBarState) {
-                    return Topbar(
-                      currentRightPage: currentRightPage,
-                      onRightMenuPressed: (c) {
-                        setState(
-                          () {
-                            if (currentRightPage == c) {
-                              currentRightPage = null;
-                            } else {
-                              currentRightPage = c;
-                            }
-                          },
-                        );
-                      },
-                    );
-                  } else if (state is ChooseTopBarState) {
-                    return ChooseTopBar(points: state.points);
-                  } else {
-                    return const BboxTopBar();
-                  }
-                }),
+                  builder: (BuildContext context, TopBarState state) {
+                    dev.log(("BLOC BUILDER SUCCESS"));
+                    if (state is MainTopBarState) {
+                      return Topbar(
+                        currentRightPage: currentRightPage,
+                        onRightMenuPressed: (c) {
+                          setState(
+                            () {
+                              if (currentRightPage == c) {
+                                currentRightPage = null;
+                              } else {
+                                currentRightPage = c;
+                              }
+                            },
+                          );
+                        },
+                      );
+                    } else if (state is ChooseTopBarState) {
+                      return ChooseTopBar(p1: state.p1,p2: state.p2,);
+                    } else {
+                      return BboxTopBar(
+                        currentRightPage: currentRightPage,
+                        onRightMenuPressed: (c) {
+                          setState(
+                                () {
+                              if (currentRightPage == c) {
+                                currentRightPage = null;
+                              } else {
+                                currentRightPage = c;
+                              }
+                            },
+                          );
+                        },
+                      );
+                    }
+                  },
+                ),
                 Expanded(
                   child: LayoutBuilder(
                     builder: (_, c) => Stack(

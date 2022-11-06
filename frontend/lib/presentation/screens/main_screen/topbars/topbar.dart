@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/presentation/screens/main_screen/topbars/tab_button.dart';
+import 'package:frontend/presentation/screens/main_screen/topbars/widgets/tab_button.dart';
 import 'package:frontend/presentation/theme/app_colors.dart';
 import 'package:frontend/presentation/widgets/search.dart';
 
