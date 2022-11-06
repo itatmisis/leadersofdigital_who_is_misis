@@ -1,10 +1,10 @@
 import sys
-import traceback
 
 import click
 from flask import cli
 from backend import app
 from backend.tools import dataset_to_db_convert, compare_excel
+from backend.tools.heatmap_decomposition import preprocess_heatmap
 
 db_cli = cli.AppGroup("db")
 
@@ -32,6 +32,12 @@ def compare(table1, table2, column):
 @db_cli.command("load-extended")
 def load_extended():
     dataset_to_db_convert.load_extended_lands()
+
+
+@db_cli.command("preprocess-heatmap")
+@click.option("--number_of_sections", type=int, default=25)
+def load_heatmap(number_of_sections):
+    preprocess_heatmap(number_of_sections)
 
 
 app.cli.add_command(db_cli)
