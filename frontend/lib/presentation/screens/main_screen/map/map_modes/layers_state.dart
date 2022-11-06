@@ -31,9 +31,18 @@ class UpdateFillLayerModel extends LayerModel{
 }
 
 class DotLayerModel extends LayerModel{
-  DotLayerModel({required this.geometry, required this.fillColor, required this.outlineColor, required this.opacity});
+  DotLayerModel({required this.geometry, this.size, required this.fillColor, required this.outlineColor, required this.opacity});
 
   LatLng geometry;
+  Color fillColor, outlineColor;
+  double? opacity;
+  double? size;
+}
+
+class PolyLayerModel extends LayerModel{
+  PolyLayerModel({required this.geometry, required this.fillColor, required this.outlineColor, required this.opacity});
+
+  List<LatLng> geometry;
   Color fillColor, outlineColor;
   double? opacity;
 }

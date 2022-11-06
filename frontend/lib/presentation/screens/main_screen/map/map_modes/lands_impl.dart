@@ -42,7 +42,7 @@ class LandsImpl implements MapInterface {
     }, outlineColor: AppColors.dewberry900, opacity: 0.3));
     context.read<DrawCubit>().draw();
 
-    t = context.read<TopBarCubit>().stream.listen((event) {
+    t = context.read<TopBarCubit>().stream.listen((event) async {
       if (event is ChooseTopBarState) {
         if (last1 != null && last2 != null && event.isContinueEnabled == true && event.isBeginEnabled == false) {
           last2 = null;
@@ -55,21 +55,6 @@ class LandsImpl implements MapInterface {
           context.read<DrawCubit>().layers.removeLast();
           context.read<DrawCubit>().draw();
         }
-      } else if (event is BboxTopBarState) {
-        LatLng lb = LatLng(last1!.latLng.latitude < last2!.latLng.latitude? last1!.latLng.latitude : last2!.latLng.latitude, last1!.latLng.longitude < last2!.latLng.longitude? last1!.latLng.longitude : last2!.latLng.longitude);
-        LatLng rt = LatLng(last1!.latLng.latitude > last2!.latLng.latitude? last1!.latLng.latitude : last2!.latLng.latitude, last1!.latLng.longitude > last2!.latLng.longitude? last1!.latLng.longitude : last2!.latLng.longitude);
-        // context.read<PolygonLoaderCubit>().load(DownloadedState.inProgress);
-        // dispose(context);
-        // Storage().lands = await Api().getLands(lb: lb, rt: rt);
-        // context.read<DrawCubit>().layers.add(FillLayerModel(event: Storage().lands, fillColor: AppColors.dewberry400, onClick:  (_, fill) {
-        //   onMapPressed(context, annotation: fill);
-        // }, outlineColor: AppColors.dewberry900, opacity: 0.3));
-        // context.read<DrawCubit>().draw();
-        // context.read<PolygonLoaderCubit>().load(DownloadedState.downloaded);
-
-        context.read<ZoomBBoxCubit>().push(ZoomBBoxState(context.read<ZoomBBoxCubit>().state.cameraPosition,lb, rt, true));
-        dispose(context);
-        context.read<MapCubit>().push(BBoxImpl());
       }
     });
   }
@@ -79,23 +64,29 @@ class LandsImpl implements MapInterface {
     if (cameraPosition.zoom < 13) {
       dispose(context);
       context.read<MapCubit>().push(HeatMapImpl());
+    } else if (cameraPosition.zoom > 15) {
+      context.read<DrawCubit>().layers.add(DotLayerModel(geometry: LatLng(55.84762, 37.5658), fillColor: AppColors.veryPeri900, outlineColor: AppColors.veryPeri900, opacity: 1, size: 100));
+      context.read<DrawCubit>().draw();
     }
   }
 
   @override
   void onMapPressed(BuildContext context, {PointAndLatLng? point, Annotation? annotation}) async {
     if (point != null) {
-      context.read<DrawCubit>().layers.add(DotLayerModel(geometry: point!.latLng, fillColor: AppColors.veryPeri900, outlineColor: AppColors.veryPeri900, opacity: 1));
-      context.read<DrawCubit>().draw();
-
       if (last1 == null) {
         last1 = point;
         print(last1!.latLng);
         context.read<TopBarCubit>().paintChoseAfterFirstPoint(point!.latLng);
+        context.read<DrawCubit>().layers.add(DotLayerModel(geometry: point!.latLng, fillColor: AppColors.veryPeri900, outlineColor: AppColors.veryPeri900, opacity: 1));
+        context.read<DrawCubit>().draw();
+
         return;
       } else if (last2 == null) {
         last2 = point;
         context.read<TopBarCubit>().paintChoseAfterSecondPoint(last1!.latLng, last2!.latLng);
+
+        context.read<DrawCubit>().layers.add(DotLayerModel(geometry: point!.latLng, fillColor: AppColors.veryPeri900, outlineColor: AppColors.veryPeri900, opacity: 1));
+        context.read<DrawCubit>().draw();
       }
 
     }

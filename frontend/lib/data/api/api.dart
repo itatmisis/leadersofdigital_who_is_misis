@@ -22,7 +22,7 @@ class Api {
 
   Api._newInstance() {
     final dio = Dio(BaseOptions(
-      baseUrl: 'http://89.108.102.188:5000/api',
+      baseUrl: 'http://89.108.102.188/api',
       connectTimeout: 1000000,
     ));
     dio.interceptors.add(ErrorInterceptor());
@@ -34,9 +34,7 @@ class Api {
 
     var response;
     if (lb != null && rt != null) {
-      print(jsonEncode({'bbox' : {'bottom_left': {'lat': lb.latitude, 'lon': lb.longitude}, 'top_right': {'lat': rt.latitude, 'lon': rt.longitude}}}));
-      response = await _client.post(ApiRoutes.lands, data: jsonEncode({'bbox' : {'bottom_left': {'lat': lb.latitude, 'lon': lb.latitude}, 'top_right': {'lat': rt.latitude, 'lon': rt.latitude}}}));
-      print(response);
+      response = await _client.get(ApiRoutes.lands, queryParameters: {'lat1': lb.latitude, 'lon1': lb.longitude, 'lat2': rt.latitude, 'lon2': rt.longitude});
     } else {
       response = await _client.get(ApiRoutes.getLands);
     }

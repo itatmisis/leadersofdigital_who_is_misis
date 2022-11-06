@@ -91,7 +91,15 @@ class _MapWidgetState extends State<MapWidget> {
           controller!.addCircle(CircleOptions(geometry: ev.geometry,
               circleOpacity: ev.opacity,
               circleColor: ev.fillColor.toHexTriplet(),
+              circleRadius: ev.size,
               circleStrokeColor: ev.outlineColor.toHexTriplet()));
+        }
+
+        if (ev is PolyLayerModel) {
+          controller!.addFill(FillOptions(geometry: [ev.geometry],
+              fillOpacity: ev.opacity,
+              fillColor: ev.fillColor.toHexTriplet(),
+              fillOutlineColor: ev.outlineColor.toHexTriplet()));
         }
       }
     });
@@ -185,7 +193,7 @@ class _MapWidgetState extends State<MapWidget> {
     }
   }
 
-  late Function(BuildContext) init, disposed;
+  Function(BuildContext)? init, disposed;
   late Function(BuildContext, {PointAndLatLng? point, Annotation? annotation}) onMapPressed;
   late Function(BuildContext, CameraPosition) onCameraMove;
 
@@ -195,13 +203,16 @@ class _MapWidgetState extends State<MapWidget> {
       children: [
         BlocBuilder<MapCubit, MapInterface>(
             builder: (_, interf) {
+
+              bool i = init == interf.init;
+
               init = interf.init;
               disposed = interf.dispose;
               onMapPressed = interf.onMapPressed;
               onCameraMove = interf.onCameraMove;
 
-              if (controller != null) {
-                init(context);
+              if (controller != null && !i) {
+                init!(context);
               }
 
               return BlocBuilder<ZoomBBoxCubit, ZoomBBoxState>(
@@ -229,7 +240,7 @@ class _MapWidgetState extends State<MapWidget> {
                         onMapPressed(context, point: PointAndLatLng(p, coordinates));
                       });
 
-                      init(context);
+                      init!(context);
                     },
                     onMapClick: (p, l) {
                       _hideShortMenu();
