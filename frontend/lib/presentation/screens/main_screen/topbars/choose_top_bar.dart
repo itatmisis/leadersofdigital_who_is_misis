@@ -82,7 +82,7 @@ class _ChooseTopBarState extends State<ChooseTopBar> {
                             },
                             child: const Text(
                               "Удалить",
-                              style: TextStyle(color: AppColors.veryPeri500),
+                              style: TextStyle(color: AppColors.gray),
                             ),
                           )),
                     ],
@@ -100,7 +100,7 @@ class _ChooseTopBarState extends State<ChooseTopBar> {
                           child: const Flexible(
                             child: Text(
                               "Начать работу",
-                              style: TextStyle(color: AppColors.veryPeri500),
+                              style: TextStyle(color: AppColors.gray),
                             ),
                           ),
                         ),
