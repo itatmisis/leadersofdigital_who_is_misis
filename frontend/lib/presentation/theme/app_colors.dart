@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+extension ColorX on Color {
+  String toHexTriplet() => '#${(value & 0xFFFFFF).toRadixString(16).padLeft(6, '0').toUpperCase()}';
+}
+
 class AppColors {
   static const Color neutral900 = Color(0xFF252525);
   static const Color neutral800 = Color(0xFF3A3A3A);
@@ -10,7 +14,6 @@ class AppColors {
   static const Color neutral300 = Color(0xFFE2E2E2);
   static const Color neutral200 = Color(0xFFECECEC);
   static const Color neutral100 = Color(0xFFF9F9F9);
-  static const Color neutralWhite = Color(0xFFFFFFFF);
 
   static const Color ultraBlack = Color(0xFF000000);
   static const Color white = Color(0xFFFFFFFF);
@@ -24,8 +27,8 @@ class AppColors {
   static const Color veryPeri600 = Color(0xFF6162A8);
   static const Color veryPeri500 = Color(0xFF6667AB);
   static const Color veryPeri400 = Color(0xFF7B7CB7);
-  static const Color veryPeri300 = Color(0xFF8989BE);
-  static const Color veryPeri200 = Color(0xFF9697C5);
+  static const Color veryPeri300 = Color(0xFFBDBEDB);
+  static const Color veryPeri200 = Color(0xFFE4E4F0);
   static const Color veryPeri100 = Color(0xFFA3A4CC);
 
   static const Color eggshellBlue900 = Color(0xFF478581);

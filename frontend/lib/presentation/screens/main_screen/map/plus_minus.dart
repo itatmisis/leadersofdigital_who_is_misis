@@ -16,7 +16,7 @@ class PlusMinusWidget extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
-            color: AppColors.neutralWhite),
+            color: AppColors.white),
         child: Column(
           children: [
             GestureDetector(
